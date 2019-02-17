@@ -61,7 +61,7 @@ class Board extends Component {
                   {boardState.tiles.map((row, i) =>
                     <tr key={i}>
                       {row.map((col, j) =>
-                        <td key={j} onMouseOver={(e)=>{ this.changeTileColor(i,j,e) }} bgcolor={col}></td>
+                        <td key={j} onMouseOver={(e)=>{ this.changeTileColor(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j,e) }} bgcolor={col}></td>
                       )}
                     </tr>
                   )}
