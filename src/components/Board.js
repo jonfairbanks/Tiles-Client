@@ -39,7 +39,7 @@ class Board extends Component {
       }
   }
 
-  changeTileColorMouseDown(x,y,e) {
+  changeTileColorMouseMove(x,y,e) {
     if(e.buttons === 1 || e.buttons === 3){
       //do some stuff
       const { socket} = this.props;
@@ -49,7 +49,10 @@ class Board extends Component {
       desiredState.tiles[x][y] = color;
       this.setState({boardState: desiredState});
       socket.emit("updateBoardState",  desiredState);
+      e.stopPropagation();
+      e.preventDefault();
     }
+    
   }
 
   handleColorPicker = (color) => {
@@ -68,7 +71,7 @@ class Board extends Component {
                   {boardState.tiles.map((row, i) =>
                     <tr key={i}>
                       {row.map((col, j) =>
-                        <td key={j} onMouseOver={(e)=>{ this.changeTileColorMouseDown(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j) }} bgcolor={col}></td>
+                        <td key={j} onMouseMove={(e)=>{ this.changeTileColorMouseMove(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j) }} bgcolor={col}></td>
                       )}
                     </tr>
                   )}
