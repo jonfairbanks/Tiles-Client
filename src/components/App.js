@@ -4,7 +4,7 @@ import Board from './Board';
 import io from "socket.io-client";
 
 const socketUrl = "https://" + process.env.REACT_APP_API;
-
+console.log(process.env);
 class App extends Component {
 
   constructor(props) {
@@ -34,11 +34,8 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Welcome to Tiles.Bsord.io</h1>
-          <p className="App-title">An experiment with React, Socket.Io, MongoDB, and eventually Canvas.</p>
+          <h1 className="App-title">Tiles - Socket.io real time app</h1>
         </header>
-        <p className="App-title">Click anywhere in they gray box below to begin 'drawing'. Open this page in another tab side by side with this one to see the effect.</p>
-
         <Board socket={socket} />
 
       </div>

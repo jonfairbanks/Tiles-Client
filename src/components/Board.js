@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import '../styles/Board.css';
-import { GithubPicker } from 'react-color';
+import { TwitterPicker } from 'react-color';
 
 class Board extends Component {
   constructor() {
@@ -18,23 +18,31 @@ class Board extends Component {
     socket.on("setBoardState", receivedState => {
       //console.log("boardState received:" + JSON.stringify(receivedState));
       this.setState({boardState: receivedState});
+      console.log(receivedState.connections);
     })
 	}
 
-  changeTileColor(x,y) {
-    const { socket} = this.props;
-    var desiredState = {...this.state.boardState}
-    var {color} = this.state;
+  changeTileColor(x,y,e) {
+    if(e.buttons === 1 || e.buttons === 3){
+      console.log(e);
+      //do some stuff
+      const { socket} = this.props;
+      var desiredState = {...this.state.boardState}
+      var {color} = this.state;
 
-    if (desiredState.tiles[x][y] === color){
-      desiredState.tiles[x][y] = desiredState.baseColor;
-      this.setState({boardState: desiredState});
-      socket.emit("updateBoardState",  desiredState);
-    } else {
-      desiredState.tiles[x][y] = color;
-      this.setState({boardState: desiredState});
-      socket.emit("updateBoardState",  desiredState);
+      if (desiredState.tiles[x][y] === color){
+        desiredState.tiles[x][y] = desiredState.baseColor;
+        this.setState({boardState: desiredState});
+        socket.emit("updateBoardState",  desiredState);
+      } else {
+        desiredState.tiles[x][y] = color;
+        this.setState({boardState: desiredState});
+        socket.emit("updateBoardState",  desiredState);
+      }
     }
+      
+
+    
   }
 
   handleColorPicker = (color) => {
@@ -48,23 +56,19 @@ class Board extends Component {
       <div style={{ textAlign: "center" }}>
         {boardState
           ? <div className="center">
-              <p>
-                The number of connections: {boardState.connections}
-              </p>
-
               <table className="center">
                 <tbody>
                   {boardState.tiles.map((row, i) =>
                     <tr key={i}>
                       {row.map((col, j) =>
-                        <td key={j} onClick={()=>{ this.changeTileColor(i,j,col) }} bgcolor={col}></td>
+                        <td key={j} onMouseOver={(e)=>{ this.changeTileColor(i,j,e) }} bgcolor={col}></td>
                       )}
                     </tr>
                   )}
                 </tbody>
 
               </table>
-              <GithubPicker
+              <TwitterPicker
                 color={ this.state.color }
                 onChangeComplete={ this.handleColorPicker }
               />
