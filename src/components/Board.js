@@ -79,9 +79,17 @@ class Board extends Component {
       this.setState({boardState: desiredState});
     })
 
+    toast('🦄 Left click anywhere to begin drawing!', {
+      position: "top-right",
+      autoClose: 7000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
     toast('🦄 Right click to open color picker!', {
       position: "top-right",
-      autoClose: 5000,
+      autoClose: 10000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
@@ -142,7 +150,7 @@ class Board extends Component {
   }
 
   handleColorPicker = (color) => {
-    this.setState({ color: color.hex });
+    this.setState({ color: color.hex});
   };
 
   handleDragStart = () => {
@@ -152,8 +160,8 @@ class Board extends Component {
     this.draggingPopup = false;
   }
   onContextMenu = (e) => {
-
-    this.setState({draggablePos:{x:e.pageX,y:e.pageY},showDraggable: true});
+    this.setState({draggablePos:{x:e.pageX,y:e.pageY}});
+    this.setState({showDraggable: true});
     e.preventDefault();
     
   }
@@ -177,10 +185,10 @@ class Board extends Component {
       <div >
         
         {boardState
-          ? <div>
+          ? <div style={{"text-align":"left"}}>
               <ToastContainer
                 position="top-right"
-                autoClose={5000}
+                autoClose={10000}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick
