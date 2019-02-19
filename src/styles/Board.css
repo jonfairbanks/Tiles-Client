@@ -28,5 +28,15 @@ div.handle {
   border-radius:4px;
   background: rgb(255, 255, 255);
   text-align: left;
-  width: 40px;
+  width: 60px;
+  float:left;
+}
+
+div.handle-close {
+  padding: 5px;
+  float:right;
+  border-radius:4px;
+  background: rgb(255, 255, 255);
+  text-align: right;
+  width: 60px;
 }

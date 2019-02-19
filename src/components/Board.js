@@ -4,6 +4,8 @@ import { SketchPicker } from 'react-color';
 import io from "socket.io-client";
 import axios from 'axios'
 import Draggable from 'react-draggable'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const socketUrl = "https://" + process.env.REACT_APP_API;
 
@@ -13,10 +15,10 @@ class Board extends Component {
     this.state = {
       boardState: false,
       color: '#FFF',
-      
       socket:null,
       boardLog: false,
-      draggablePos: {x:100,y:100}
+      draggablePos: {x:100,y:100},
+      showDraggable: false
     };
     this.draggingPopup = false;
     this.pendingChanges= []
@@ -76,6 +78,15 @@ class Board extends Component {
       }
       this.setState({boardState: desiredState});
     })
+
+    toast('🦄 Right click to open color picker!', {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
 
 	}
 
@@ -141,6 +152,8 @@ class Board extends Component {
     this.draggingPopup = false;
   }
   onContextMenu = (e) => {
+
+    this.setState({draggablePos:{x:e.pageX,y:e.pageY},showDraggable: true});
     e.preventDefault();
     
   }
@@ -159,31 +172,49 @@ class Board extends Component {
 
   render() {
 
-    const { boardState,draggablePos } = this.state;
+    const { boardState,draggablePos,showDraggable } = this.state;
     return (
       <div >
         
         {boardState
           ? <div>
-              <Draggable
-                handle=".handle"
-                defaultPosition={{x: draggablePos.x, y: draggablePos.y}}
-                bounds="parent"
-                position={null}
-                scale={1}
-                onStart={this.handleDragStart}
-                onDrag={this.handleDrag}
-                onStop={this.handleDragStop}
-              >
-                <div className="draggable-wrapper">
-                  <div className="handle">Move</div>
-                  <SketchPicker
-                    color={ this.state.color }
-                    onChangeComplete={ this.handleColorPicker }
-                  />
-                </div>
+              <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnVisibilityChange
+                draggable
+                pauseOnHover
+                />
+                {/* Same as */}
+              <ToastContainer />
+            {showDraggable
+              ? <Draggable
+              handle=".handle"
+              defaultPosition={{x: draggablePos.x, y: draggablePos.y}}
+              bounds="parent"
+              position={null}
+              scale={1}
+              onStart={this.handleDragStart}
+              onDrag={this.handleDrag}
+              onStop={this.handleDragStop}
+            >
+              <div className="draggable-wrapper">
+                <div className="handle" onMouseOver={()=>{document.body.style.cursor = "move"}} onMouseOut={()=>{document.body.style.cursor = "default"}}>[+]</div>
+                <div className="handle-close" onMouseOver={()=>{document.body.style.cursor = "pointer"}} onMouseOut={()=>{document.body.style.cursor = "default"}} onClick={()=>{this.setState({showDraggable: false});document.body.style.cursor = "default"}}>[x]</div>
+                <SketchPicker
+                  color={ this.state.color }
+                  onChangeComplete={ this.handleColorPicker }
+                />
+              </div>
 
-              </Draggable >
+            </Draggable >
+              : (null)
+            }
+              
               <table className="center">
                 <tbody>
                   {boardState.tiles.map((row, i) =>
