@@ -1,25 +1,69 @@
 import React, { Component } from "react";
 import '../styles/Board.css';
-import { TwitterPicker } from 'react-color';
+import { SketchPicker } from 'react-color';
+import io from "socket.io-client";
+import axios from 'axios'
+import Draggable from 'react-draggable'
+
+const socketUrl = "https://" + process.env.REACT_APP_API;
 
 class Board extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       boardState: false,
       color: '#FFF',
-      pendingChanges: []
+      pendingChanges: [],
+      socket:null,
+      boardLog: false
     };
   }
 
+  getBoardLog = () => {
+    // Get all users from API
+    this.setState({fetchingLog: true})
+    axios
+      .get('https://' + process.env.REACT_APP_API + '/tiles/' + this.props.match.params.boardId + '/log')
+      .then(res => {
+        this.setState({ data: res.data ? res.data : [], isFetching:false})
+        console.log(res.data)
+        this.setState({fetchingLog: false})
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({fetchingLog: false})
+      })
+  }
+
+  componentWillMount() {
+		this.initSocket()
+  }
+
+  initSocket = ()=>{
+		const socket = io(socketUrl)
+
+		socket.on('connect', ()=>{
+      console.log("Connected");
+      socket.emit("joinChannel", this.props.match.params.boardId);
+    })
+    
+    socket.on("disconnect", () => {
+      console.log("Disconnected");
+    });
+
+		this.setState({socket})
+  }
+  componentWillUnmount(){
+    const { socket} = this.state;
+    socket.disconnect()
+  }
   componentDidMount() {
     // DEFINE SOCKET EVENT LISTENERS
 
-    const { socket} = this.props;
+    const { socket} = this.state;
    
     socket.on("setBoardState", receivedState => {
       this.setState({boardState: receivedState});
-      console.log(receivedState.connections);
     })
 
     socket.on("updateTiles", tileUpdateData => {
@@ -45,11 +89,13 @@ class Board extends Component {
         desiredState.tiles[x][y] = desiredState.baseColor;
         tileUpdateData.color = desiredState.baseColor
         //this.setState({boardState: desiredState});
+        
         this.state.pendingChanges.push(tileUpdateData);
         //socket.emit("updateTile", tileUpdateData)
       } else {
         desiredState.tiles[x][y] = color;
         //this.setState({boardState: desiredState});
+        e.target.setAttribute("bgColor", color);
         this.state.pendingChanges.push(tileUpdateData);
         //socket.emit("updateTile", tileUpdateData)
       }
@@ -76,9 +122,9 @@ class Board extends Component {
   }
 
   handleMouseUp(){
-    const { socket} = this.props;
+    const { socket} = this.state;
     console.log(this.state.pendingChanges);
-    socket.emit("updateTiles", this.selectUniqueChanges(this.state.pendingChanges))
+    socket.emit("updateTiles", this.props.match.params.boardId, this.selectUniqueChanges(this.state.pendingChanges))
     this.setState({pendingChanges: []})
   }
 
@@ -100,11 +146,27 @@ class Board extends Component {
 
   render() {
     const { boardState } = this.state;
-
     return (
-      <div style={{ textAlign: "center" }}>
+      <div >
         {boardState
-          ? <div className="center">
+          ? <div>
+              <Draggable
+                handle=".handle"
+                defaultPosition={{x: 700, y: 600}}
+                position={null}
+                scale={1}
+                onStart={this.handleStart}
+                onDrag={this.handleDrag}
+                onStop={this.handleStop}>
+                <div className="draggable-wrapper">
+                  <div className="handle">Move</div>
+                  <SketchPicker
+                    color={ this.state.color }
+                    onChangeComplete={ this.handleColorPicker }
+                  />
+                </div>
+
+              </Draggable >
               <table className="center">
                 <tbody>
                   {boardState.tiles.map((row, i) =>
@@ -117,11 +179,10 @@ class Board extends Component {
                 </tbody>
 
               </table>
-              <TwitterPicker
-                color={ this.state.color }
-                onChangeComplete={ this.handleColorPicker }
-              />
+              
+              
 
+              
             </div>
           : <p>Loading...</p>}
       </div>

@@ -4,11 +4,9 @@ table.center {
     margin-right:auto;
     border-spacing: 0;
     background: rgb(255, 255, 255);
-    border: 1px solid rgba(0, 0, 0, 0.2);
     box-shadow: rgba(0, 0, 0, 0.15) 0px 3px 12px;
-    border-radius: 4px;
-    padding: 5px;
-
+    height:100vh;
+    width:100vw;
   }
 
 div.github-picker {
@@ -18,4 +16,17 @@ div.github-picker {
 td {
   height:5px;
   width: 5px;
+}
+
+div.draggable-wrapper {
+  display: inline-block;
+  position: absolute;
+}
+
+div.handle {
+  padding: 5px;
+  border-radius:4px;
+  background: rgb(255, 255, 255);
+  text-align: left;
+  width: 40px;
 }

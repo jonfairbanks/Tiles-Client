@@ -1,43 +1,22 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import '../styles/App.css';
+import Home from './Home';
 import Board from './Board';
-import io from "socket.io-client";
 
-const socketUrl = "https://" + process.env.REACT_APP_API;
-console.log(process.env);
 class App extends Component {
 
-  constructor(props) {
-	  super(props);
-
-	  this.state = {
-	  	socket:null,
-	  };
-	}
-
-  componentWillMount() {
-		this.initSocket()
-	}
-
-  initSocket = ()=>{
-		const socket = io(socketUrl)
-
-		socket.on('connect', ()=>{
-			console.log("Connected");
-		})
-
-		this.setState({socket})
-	}
-
   render() {
-    const {socket} = this.state;
     return (
       <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">Tiles - Socket.io real time app</h1>
-        </header>
-        <Board socket={socket} />
+        
 
+        <Router>
+          <div>
+            <Route exact path="/" component={Home} />
+            <Route path="/board/:boardId" {...this.props} component={Board} />
+          </div>
+        </Router>
       </div>
     );
   }
