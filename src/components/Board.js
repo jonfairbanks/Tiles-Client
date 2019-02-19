@@ -15,8 +15,9 @@ class Board extends Component {
       color: '#FFF',
       pendingChanges: [],
       socket:null,
-      boardLog: false
+      boardLog: false,
     };
+    this.dragging = false;
   }
 
   getBoardLog = () => {
@@ -102,7 +103,7 @@ class Board extends Component {
   }
 
   changeTileColorMouseMove(x,y,e) {
-    if(e.buttons === 1 || e.buttons === 3){
+    if((e.buttons === 1 || e.buttons === 3) && this.dragging === false){
       //do some stuff
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
@@ -132,6 +133,13 @@ class Board extends Component {
     this.setState({ color: color.hex });
   };
 
+  handleDragStart = () => {
+    this.dragging = true;
+  }
+  handleDragStop = () => {
+    this.dragging = false;
+  }
+
   selectUniqueChanges(arr) {
     var uniques = [];
     var itemsFound = {};
@@ -153,11 +161,13 @@ class Board extends Component {
               <Draggable
                 handle=".handle"
                 defaultPosition={{x: 700, y: 600}}
+                bounds="parent"
                 position={null}
                 scale={1}
-                onStart={this.handleStart}
+                onStart={this.handleDragStart}
                 onDrag={this.handleDrag}
-                onStop={this.handleStop}>
+                onStop={this.handleDragStop}
+              >
                 <div className="draggable-wrapper">
                   <div className="handle">Move</div>
                   <SketchPicker
