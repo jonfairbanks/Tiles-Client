@@ -13,11 +13,13 @@ class Board extends Component {
     this.state = {
       boardState: false,
       color: '#FFF',
-      pendingChanges: [],
+      
       socket:null,
       boardLog: false,
+      draggablePos: {x:100,y:100}
     };
-    this.dragging = false;
+    this.draggingPopup = false;
+    this.pendingChanges= []
   }
 
   getBoardLog = () => {
@@ -78,6 +80,8 @@ class Board extends Component {
 	}
 
   changeTileColor(x,y,e) {
+    if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
+      console.log(e.buttons)
       //do some stuff
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
@@ -89,21 +93,20 @@ class Board extends Component {
       if (desiredState.tiles[x][y] === color){
         desiredState.tiles[x][y] = desiredState.baseColor;
         tileUpdateData.color = desiredState.baseColor
-        //this.setState({boardState: desiredState});
-        
-        this.state.pendingChanges.push(tileUpdateData);
-        //socket.emit("updateTile", tileUpdateData)
+        e.target.setAttribute("bgColor", desiredState.baseColor);
+        this.pendingChanges.push(tileUpdateData);
       } else {
         desiredState.tiles[x][y] = color;
-        //this.setState({boardState: desiredState});
         e.target.setAttribute("bgColor", color);
-        this.state.pendingChanges.push(tileUpdateData);
-        //socket.emit("updateTile", tileUpdateData)
+        this.pendingChanges.push(tileUpdateData);
       }
+    } else {
+
+    }
   }
 
   changeTileColorMouseMove(x,y,e) {
-    if((e.buttons === 1 || e.buttons === 3) && this.dragging === false){
+    if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
       //do some stuff
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
@@ -112,10 +115,9 @@ class Board extends Component {
       tileUpdateData.y = y
       tileUpdateData.color = color
 
-      this.state.pendingChanges.push(tileUpdateData);
+      this.pendingChanges.push(tileUpdateData);
       e.target.setAttribute("bgColor", color);
       desiredState.tiles[x][y] = color;
-      //this.setState({boardState: desiredState});
 
       e.stopPropagation();
       e.preventDefault();
@@ -124,9 +126,8 @@ class Board extends Component {
 
   handleMouseUp(){
     const { socket} = this.state;
-    console.log(this.state.pendingChanges);
-    socket.emit("updateTiles", this.props.match.params.boardId, this.selectUniqueChanges(this.state.pendingChanges))
-    this.setState({pendingChanges: []})
+    socket.emit("updateTiles", this.props.match.params.boardId, this.selectUniqueChanges(this.pendingChanges))
+    this.pendingChanges= []
   }
 
   handleColorPicker = (color) => {
@@ -134,10 +135,14 @@ class Board extends Component {
   };
 
   handleDragStart = () => {
-    this.dragging = true;
+    this.draggingPopup = true;
   }
   handleDragStop = () => {
-    this.dragging = false;
+    this.draggingPopup = false;
+  }
+  onContextMenu = (e) => {
+    e.preventDefault();
+    
   }
 
   selectUniqueChanges(arr) {
@@ -153,14 +158,16 @@ class Board extends Component {
   }
 
   render() {
-    const { boardState } = this.state;
+
+    const { boardState,draggablePos } = this.state;
     return (
       <div >
+        
         {boardState
           ? <div>
               <Draggable
                 handle=".handle"
-                defaultPosition={{x: 700, y: 600}}
+                defaultPosition={{x: draggablePos.x, y: draggablePos.y}}
                 bounds="parent"
                 position={null}
                 scale={1}
@@ -182,17 +189,13 @@ class Board extends Component {
                   {boardState.tiles.map((row, i) =>
                     <tr key={i}>
                       {row.map((col, j) =>
-                        <td key={j} onMouseMove={(e)=>{ this.changeTileColorMouseMove(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j,e) }} onMouseUp={()=>this.handleMouseUp()} bgcolor={col}></td>
+                        <td key={j} onMouseMove={(e)=>{ this.changeTileColorMouseMove(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j,e) }} onMouseUp={()=>this.handleMouseUp()} onContextMenu={(e)=>{this.onContextMenu(e)}}bgcolor={col}></td>
                       )}
                     </tr>
                   )}
                 </tbody>
 
               </table>
-              
-              
-
-              
             </div>
           : <p>Loading...</p>}
       </div>
