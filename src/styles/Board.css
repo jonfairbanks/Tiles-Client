@@ -21,6 +21,8 @@ td {
 div.draggable-wrapper {
   display: inline-block;
   position: absolute;
+  background: rgb(255, 255, 255);
+  border-radius:4px;
 }
 
 div.handle {
@@ -39,4 +41,8 @@ div.handle-close {
   background: rgb(255, 255, 255);
   text-align: right;
   width: 60px;
+}
+
+div.draggable-more {
+  padding-left:10px;
 }

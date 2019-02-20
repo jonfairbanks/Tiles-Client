@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import '../styles/App.css';
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 class Home extends Component {
   constructor() {
@@ -58,13 +59,13 @@ class Home extends Component {
           <label>New Board Name:</label><input onChange={(e)=>this.handleNameChange(e)}></input>
           <button onClick={(e)=>this.createNewBoard()}>Create new board</button>
         </span> 
-        <ul>
+        <ul style={{"list-style":"none"}}>
           {!this.state.data ? (<p>Loading boards.. </p>) : 
             this.state.data.map((board, key) => {
               const redirPath = "/board/" + board._id
               return(
                 <li key={key} >
-                  <Link to={redirPath}>{board.name}</Link>
+                  <FontAwesomeIcon icon={['fas','chess-board']} /><Link to={redirPath}>{board.name}</Link>
                 </li>
               )
             })

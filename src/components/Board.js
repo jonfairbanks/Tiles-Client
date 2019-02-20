@@ -217,6 +217,11 @@ class Board extends Component {
                   color={ this.state.color }
                   onChangeComplete={ this.handleColorPicker }
                 />
+                <div className="draggable-more">
+                  <p>Coming soon..</p>
+                  <p>Coming soon..</p>
+                </div>
+                
               </div>
 
             </Draggable >
