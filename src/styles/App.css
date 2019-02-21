@@ -10,20 +10,18 @@
 .App-header {
   background-color: #222;
   padding: 10px;
-  color: white;
-  margin-bottom: 10px;
-}
-
-h1 {
   color: #36D8B7;
+  margin-bottom: 10px;
+  font-size: 2.5em;
 }
 
 h4 {
-  font-size: 1em;
+  font-size: 2.5em;
 }
 
 .App-title {
-  font-size: 1.5em;
+  font-family: 'VT323', monospace;
+  font-size: 2.5em;
 }
 
 .App-intro {
