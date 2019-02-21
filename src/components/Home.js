@@ -71,7 +71,7 @@ class Home extends Component {
           <div id="left">
             <h3>Popular Boards</h3>
             {!this.state.data ? (
-              <div class="centered">
+              <div className="centered">
                 <RingLoader
                   sizeUnit={"px"}
                   size={25}
@@ -99,7 +99,7 @@ class Home extends Component {
           <div id="right">
             <h3>Recent Boards</h3>
             {!this.state.data ? (
-              <div class="centered">
+              <div className="centered">
                 <RingLoader
                   sizeUnit={"px"}
                   size={25}
