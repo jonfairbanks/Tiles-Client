@@ -3,7 +3,7 @@ import '../styles/App.css';
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { RingLoader } from 'react-spinners';
-import { Button, Input } from 'semantic-ui-react';
+import { Input } from 'semantic-ui-react';
 
 class Home extends Component {
   constructor() {
