@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import '../styles/App.css';
 import { Link } from 'react-router-dom'
 import axios from 'axios'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { RingLoader } from 'react-spinners';
 
 class Home extends Component {
@@ -72,7 +71,7 @@ class Home extends Component {
               const redirPath = "/board/" + board._id
               return(
                 <li key={key} >
-                  <FontAwesomeIcon icon={['fas','chess-board']} /><Link to={redirPath}>{board.name}</Link>
+                  <i class="fas fa-chess-board"></i><Link to={redirPath}>{board.name}</Link>
                 </li>
               )
             })

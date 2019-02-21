@@ -3,9 +3,6 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import '../styles/App.css';
 import Home from './Home';
 import Board from './Board';
-import { library } from '@fortawesome/fontawesome-svg-core'
-import {faChessBoard} from '@fortawesome/free-solid-svg-icons'
-library.add(faChessBoard)
 
 
 class App extends Component {
