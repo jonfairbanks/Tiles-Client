@@ -6,7 +6,6 @@ import { RingLoader } from 'react-spinners';
 import { Input, Button, Divider, Form, Grid, Segment } from 'semantic-ui-react';
 import PNGImage from 'pnglib-es6';
 
-
 class Home extends Component {
   constructor() {
     super();
@@ -14,13 +13,12 @@ class Home extends Component {
       isFetching: false,
       newBoardName: "",
     };
-    this.newBoardName = ""
   }
   
   createNewBoard = () => {
     // Get all users from API
     axios
-      .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: this.newBoardName, baseColor:"#222"})
+      .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: this.state.newBoardName, baseColor:"#222"})
       .then(res => {
         if(res.data.success){
           this.props.history.push('/'+ res.data.boardId);
@@ -34,7 +32,7 @@ class Home extends Component {
   }
 
   handleNameChange = (e) => {
-    this.newBoardName = e.target.value
+    this.setState({newBoardName: e.target.value})
   }
 
   getAllBoards = () => {
@@ -72,27 +70,46 @@ class Home extends Component {
           <h1 className="App-title">Tiles</h1>
         </header>
         <Segment placeholder>
-          <Grid columns={2} relaxed='very' stackable color={"red"}>
+          <Grid columns={2} relaxed='very' stackable>
             <Grid.Column>
               <div className="centered-vh">
                 <span className="input-group-btn">
+                    <h2 style={{color:"#707070", textAlign: "center"}}>Get Started</h2>
                     <Input
-                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard()}}
+                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard(), onChange: (e)=>this.handleNameChange(e)}}
                       placeholder='Board Name'
                       onChange={(e)=>this.handleNameChange(e)}
                     />
+                    <ul style={{color:"#707070", textAlign: "left"}}>
+                      <li>Create yourself a board</li>
+                      <li>Share the link with your friends</li>
+                      <li>Start drawing!</li>
+                    </ul>
                 </span>
               </div>
             </Grid.Column>
-            <Grid.Column verticalAlign='middle'>
+            <Grid.Column>
               <Form>
-                  <Form.Input icon='user' iconPosition='left' label='Username' placeholder='Username' />
-                  <Form.Input icon='lock' iconPosition='left' label='Password' type='password' />
-                  <Button content='Login' primary />
-                </Form>
+                <div className="centered-vh">
+                  <h2 style={{color:"#707070", textAlign: "center"}}>MyTiles</h2>
+                  <div style={{float: "left", paddingRight: "15px"}}>
+                    <Form.Input icon='user' iconPosition='left' label='Username' placeholder='Username' />
+                  </div>
+                  <div style={{float: "left", paddingRight: "15px", paddingBottom: "13px"}}>
+                    <Form.Input icon='lock' iconPosition='left' label='Password' placeholder='Password' type='password' />
+                  </div>
+                  <br/>
+                  <div>
+                    <Button.Group>
+                      <Button color="grey">Login</Button>
+                      <Button.Or />
+                      <Button>Register</Button>
+                    </Button.Group>
+                  </div>
+                </div>
+              </Form>
             </Grid.Column>
           </Grid>
-
           <Divider vertical>or</Divider>
         </Segment>
         <div id="container">
@@ -114,16 +131,12 @@ class Home extends Component {
                   <span key={key} >
                     <Link style={{color:"#707070", textAlign: "center", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
                     <br/>
-                    <img src={this.getBoardPng(board.boardData)} style={{"border":"1px solid #FFF"}}/>
+                    <img src={this.getBoardPng(board.boardData)} alt={"popular-" + this.state.newBoardName} style={{"border":"1px solid #FFF"}}/>
                     <br/>
                   </span>
                 )
               })
             }
-          </div>
-          {/* CENTER SECTION */}
-          <div id="center">
-            <h3>Getting Started</h3>
           </div>
 
           {/* RIGHT SECTION */}
