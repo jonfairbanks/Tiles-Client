@@ -31,7 +31,7 @@ class Home extends Component {
   }
 
   handleNameChange = (e) => {
-    this.setState({newBoardName: e.target})
+    this.setState({newBoardName: e.target.value})
   }
 
   getAllBoards = () => {
@@ -60,10 +60,10 @@ class Home extends Component {
         <span className="input-group-btn">
           <Input
             inverted
-            action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'Create a board' }}
+            action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'Create a board', onClick: (e)=>this.createNewBoard(), onChange: (e)=>this.handleNameChange(e)}}
             defaultValue='Board Name'
             onChange={(e)=>this.handleNameChange(e)}
-            onClick={(e)=>this.createNewBoard()}
+            
           />
         </span> 
         <ul style={{"listStyle":"none"}}>
