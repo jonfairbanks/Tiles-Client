@@ -14,12 +14,13 @@ class Home extends Component {
       isFetching: false,
       newBoardName: "",
     };
+    this.newBoardName = ""
   }
   
   createNewBoard = () => {
     // Get all users from API
     axios
-      .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: this.state.newBoardName, baseColor:"#222"})
+      .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: this.newBoardName, baseColor:"#222"})
       .then(res => {
         if(res.data.success){
           this.props.history.push('/'+ res.data.boardId);
@@ -33,7 +34,7 @@ class Home extends Component {
   }
 
   handleNameChange = (e) => {
-    this.setState({newBoardName: e.target.value})
+    this.newBoardName = e.target.value
   }
 
   getAllBoards = () => {
@@ -76,8 +77,9 @@ class Home extends Component {
               <div className="centered-vh">
                 <span className="input-group-btn">
                     <Input
-                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard(), onChange: (e)=>this.handleNameChange(e)}}
+                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard()}}
                       placeholder='Board Name'
+                      onChange={(e)=>this.handleNameChange(e)}
                     />
                 </span>
               </div>
