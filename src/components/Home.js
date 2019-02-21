@@ -3,7 +3,7 @@ import '../styles/App.css';
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { RingLoader } from 'react-spinners';
-import { Input } from 'semantic-ui-react';
+import { Input, Button, Divider, Form, Grid, Segment } from 'semantic-ui-react';
 
 class Home extends Component {
   constructor() {
@@ -57,15 +57,30 @@ class Home extends Component {
         <header className="App-header">
           <h1 className="App-title">Tiles</h1>
         </header>
-        <span className="input-group-btn">
-          <Input
-            inverted
-            action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'Create a board', onClick: (e)=>this.createNewBoard(), onChange: (e)=>this.handleNameChange(e)}}
-            defaultValue='Board Name'
-            onChange={(e)=>this.handleNameChange(e)}
-          />
-        </span>
-        <br/>
+        <Segment placeholder>
+          <Grid columns={2} relaxed='very' stackable color={"red"}>
+            <Grid.Column>
+              <div className="centered-vh">
+                <span className="input-group-btn">
+                    <Input
+                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard(), onChange: (e)=>this.handleNameChange(e)}}
+                      placeholder='Board Name'
+                      onChange={(e)=>this.handleNameChange(e)}
+                    />
+                </span>
+              </div>
+            </Grid.Column>
+            <Grid.Column verticalAlign='middle'>
+              <Form>
+                  <Form.Input icon='user' iconPosition='left' label='Username' placeholder='Username' />
+                  <Form.Input icon='lock' iconPosition='left' label='Password' type='password' />
+                  <Button content='Login' primary />
+                </Form>
+            </Grid.Column>
+          </Grid>
+
+          <Divider vertical>or</Divider>
+        </Segment>
         <div id="container">
           {/* LEFT SECTION */}
           <div id="left">
@@ -83,7 +98,7 @@ class Home extends Component {
                 const redirPath = "/" + board._id
                 return(
                   <span key={key} >
-                    <Link style={{color:"#707070", textAlign: "center", paddingLeft: "5px", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
+                    <Link style={{color:"#707070", textAlign: "center", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
                     <br/>
                   </span>
                 )
@@ -111,7 +126,7 @@ class Home extends Component {
                 const redirPath = "/" + board._id
                 return(
                   <span key={key} >
-                    <Link style={{color:"#707070", textAlign: "center", paddingLeft: "5px", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
+                    <Link style={{color:"#707070", textAlign: "center", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
                     <br/>
                   </span>
                 )
