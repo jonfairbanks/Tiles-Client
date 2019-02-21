@@ -95,7 +95,7 @@ class Home extends Component {
                   <div style={{float: "left", paddingRight: "15px"}}>
                     <Form.Input icon='user' iconPosition='left' label='Username' placeholder='Username' />
                   </div>
-                  <div style={{float: "left", paddingRight: "15px", paddingBottom: "13px"}}>
+                  <div style={{float: "left", paddingRight: "15px", paddingBottom: "15px"}}>
                     <Form.Input icon='lock' iconPosition='left' label='Password' placeholder='Password' type='password' />
                   </div>
                   <br/>
@@ -124,18 +124,20 @@ class Home extends Component {
                   color={'#36D8B7'}
                 />
               </div>
-            ) : 
-              this.state.data.map((board, key) => {
-                const redirPath = "/" + board._id
-                return(
-                  <span key={key} >
-                    <Link style={{color:"#707070", textAlign: "center", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
-                    <br/>
-                    <img src={this.getBoardPng(board.boardData)} alt={"popular-" + this.state.newBoardName} style={{"border":"1px solid #FFF"}}/>
-                    <br/>
-                  </span>
-                )
-              })
+            ) :
+              <div style={{height: '500px', overflowX: "hidden"}}>
+                {this.state.data.map((board, key) => {
+                  const redirPath = "/" + board._id
+                  return(
+                    <span key={key} >
+                      <Link style={{color:"#707070", textAlign: "center", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
+                      <br/>
+                      <img src={this.getBoardPng(board.boardData)} alt={"popular-" + this.state.newBoardName} style={{"border":"1px solid #FFF"}}/>
+                      <br/>
+                    </span>
+                  )
+                })}
+              </div>
             }
           </div>
 
