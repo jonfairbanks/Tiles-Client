@@ -6,6 +6,7 @@ import axios from 'axios'
 import Draggable from 'react-draggable'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { RingLoader } from 'react-spinners';
 
 const socketUrl = "https://" + process.env.REACT_APP_API;
 
@@ -229,7 +230,15 @@ class Board extends Component {
                 </tbody>
               </table>
             </div>
-          : <p>Loading...</p>}
+          :
+            <div class="centered-vh">
+              <RingLoader
+                sizeUnit={"px"}
+                size={125}
+                color={'#36D8B7'}
+              />
+            </div>
+        }
       </div>
     );
   }

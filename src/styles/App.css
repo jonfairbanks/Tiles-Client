@@ -14,6 +14,10 @@
   margin-bottom: 10px;
 }
 
+h1 {
+  color: #36D8B7;
+}
+
 h4 {
   font-size: 1em;
 }
@@ -29,4 +33,15 @@ h4 {
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+body {
+  background-color: #222222;
+  color: #36D8B7;
+}
+@media screen and (prefers-color-scheme: light) {
+  body {
+    background-color: #36D8B7;
+    color: #222222;
+  }
 }
