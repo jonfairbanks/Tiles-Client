@@ -20,6 +20,7 @@ class Board extends Component {
       socket:null,
       boardLog: false,
       draggablePos: {x:100,y:100},
+      userCount: 1,
     };
     this.draggingPopup = false;
     this.pendingChanges= []
@@ -193,8 +194,7 @@ class Board extends Component {
                 pauseOnVisibilityChange={false}
                 draggable
                 pauseOnHover
-                />
-                {/* Same as */}
+              />
               <ToastContainer />
               <Draggable
                 handle=".handle"
@@ -206,18 +206,27 @@ class Board extends Component {
                 onDrag={this.handleDrag}
                 onStop={this.handleDragStop}
               >
-                <div className="draggable-wrapper" id="#draggable" style={{"display":"none"}}>
-                  <div className="handle" onMouseOver={()=>{document.body.style.cursor = "move"}} onMouseOut={()=>{document.body.style.cursor = "default"}}><i style={{color:"#707070"}} className="fas fa-arrows-alt"/></div>
-                  <div className="handle-close" onMouseOver={()=>{document.body.style.cursor = "pointer"}} onMouseOut={()=>{document.body.style.cursor = "default"}} onClick={(e)=>{e.currentTarget.parentElement.style.display="none"}}><i style={{color:"#707070"}} className="fas fa-times"/></div>
-                  <SketchPicker
-                    color={ this.state.color }
-                    onChangeComplete={ this.handleColorPicker }
-                  />
-                  <div className="draggable-more">
-                  <span>
-                    <i style={{color:"#707070"}} className="fas fa-home"/>
-                    <Link style={{color:"#707070", textAlign: "center", fontSize: "16px", paddingLeft: "5px"}} to="/">Return Home</Link>
-                  </span>
+                <div>
+                  <div className="draggable-wrapper" id="#draggable" style={{"display":"none"}}>
+                    <div className="handle" onMouseOver={()=>{document.body.style.cursor = "move"}} onMouseOut={()=>{document.body.style.cursor = "default"}}><i style={{color:"#707070"}} className="fas fa-arrows-alt"/></div>
+                    <div className="handle-close" onMouseOver={()=>{document.body.style.cursor = "pointer"}} onMouseOut={()=>{document.body.style.cursor = "default"}} onClick={(e)=>{e.currentTarget.parentElement.style.display="none"}}><i style={{color:"#707070"}} className="fas fa-times"/></div>
+                    <SketchPicker
+                      color={ this.state.color }
+                      onChangeComplete={ this.handleColorPicker }
+                    />
+                    <div className="draggable-more" style={{margin: "10px 0 10px 0"}}>
+                      <span>
+                        <div id="circle">
+                        <i style={{color:"#707070", margin: "5px 0 0 3.1px"}} className="fas fa-users"/></div>
+                        <Link style={{color:"#707070", textAlign: "center", fontSize: "16px", paddingLeft: "5px"}} to="#">{this.state.userCount} User(s) Online</Link>
+                      </span>
+                      <hr style={{margin:"10px 0 10px 0"}} />
+                      <span>
+                        <i style={{color:"#707070"}} className="fas fa-home"/>
+                        <Link style={{color:"#707070", textAlign: "center", fontSize: "16px", padding: "5px"}} to="/">Return Home</Link>
+                      </span>
+                    </div>
+
                   </div>
                 </div>
               </Draggable >
