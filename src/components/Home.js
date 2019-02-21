@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import '../styles/App.css';
 import { Link } from 'react-router-dom'
 import axios from 'axios'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { RingLoader } from 'react-spinners';
 
 class Home extends Component {
   constructor() {
@@ -22,7 +22,6 @@ class Home extends Component {
         } else {
           console.log(res.data)
         }
-        
       })
       .catch(error => {
         console.log(error);
@@ -51,20 +50,28 @@ class Home extends Component {
   render() {
     return (
       <div className="App">
-      <header className="App-header">
-          <h1 className="App-title">Tiles - Socket.io real time drawing app.</h1>
+        <header className="App-header">
+          <h1 className="App-title">Tiles</h1>
         </header>
         <span className="input-group-btn">
           <label>New Board Name:</label><input onChange={(e)=>this.handleNameChange(e)}></input>
           <button onClick={(e)=>this.createNewBoard()}>Create new board</button>
         </span> 
         <ul style={{"listStyle":"none"}}>
-          {!this.state.data ? (<p>Loading boards.. </p>) : 
+          {!this.state.data ? (
+            <div class="centered">
+              <RingLoader
+                sizeUnit={"px"}
+                size={25}
+                color={'#36D8B7'}
+              />
+            </div>
+          ) : 
             this.state.data.map((board, key) => {
               const redirPath = "/board/" + board._id
               return(
                 <li key={key} >
-                  <FontAwesomeIcon icon={['fas','chess-board']} /><Link to={redirPath}>{board.name}</Link>
+                  <i class="fas fa-chess-board"></i><Link to={redirPath}>{board.name}</Link>
                 </li>
               )
             })

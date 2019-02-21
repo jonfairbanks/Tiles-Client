@@ -6,6 +6,7 @@ import axios from 'axios'
 import Draggable from 'react-draggable'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { RingLoader } from 'react-spinners';
 
 const socketUrl = "https://" + process.env.REACT_APP_API;
 
@@ -30,7 +31,7 @@ class Board extends Component {
       .get('https://' + process.env.REACT_APP_API + '/tiles/' + this.props.match.params.boardId + '/log')
       .then(res => {
         this.setState({ data: res.data ? res.data : [], isFetching:false})
-        console.log(res.data)
+        //console.log(res.data)
         this.setState({fetchingLog: false})
       })
       .catch(error => {
@@ -45,16 +46,13 @@ class Board extends Component {
 
   initSocket = ()=>{
 		const socket = io(socketUrl)
-
 		socket.on('connect', ()=>{
-      console.log("Connected");
+      //console.log("Connected");
       socket.emit("joinChannel", this.props.match.params.boardId);
     })
-    
     socket.on("disconnect", () => {
-      console.log("Disconnected");
+      //console.log("Disconnected");
     });
-
 		this.setState({socket})
   }
   componentWillUnmount(){
@@ -63,9 +61,7 @@ class Board extends Component {
   }
   componentDidMount() {
     // DEFINE SOCKET EVENT LISTENERS
-
     const { socket} = this.state;
-   
     socket.on("setBoardState", receivedState => {
       this.setState({boardState: receivedState});
     })
@@ -78,35 +74,37 @@ class Board extends Component {
       this.setState({boardState: desiredState});
     })
 
-    toast('Left click anywhere to begin drawing!', {
-      position: "top-right",
-      autoClose: 7000,
-      hideProgressBar: false,
+    toast('✏️ Click to begin drawing!', {
+      position: "bottom-right",
+      autoClose: 5500,
+      hideProgressBar: true,
       closeOnClick: true,
-      pauseOnHover: true,
+      pauseOnHover: false,
       draggable: true,
-    });
-    toast('Right click to open color picker!', {
-      position: "top-right",
-      autoClose: 10000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
+      type: toast.TYPE.SUCCESS
     });
 
+    setTimeout(() => {
+      toast('🌈 Right click to change colors!', {
+        position: "bottom-right",
+        autoClose: 5500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        type: toast.TYPE.INFO
+      });
+    }, 12000);
 	}
 
   changeTileColor(x,y,e) {
     if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
-
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
       var tileUpdateData = {}
       tileUpdateData.x = x
       tileUpdateData.y = y
       tileUpdateData.color = color
-
       if (desiredState.tiles[x][y] === color){
         desiredState.tiles[x][y] = desiredState.baseColor;
         tileUpdateData.color = desiredState.baseColor
@@ -117,9 +115,7 @@ class Board extends Component {
         e.target.setAttribute("bgColor", color);
         this.pendingChanges.push(tileUpdateData);
       }
-    } else {
-
-    }
+    } else {}
   }
 
   changeTileColorMouseMove(x,y,e) {
@@ -154,9 +150,11 @@ class Board extends Component {
   handleDragStart = () => {
     this.draggingPopup = true;
   }
+
   handleDragStop = () => {
     this.draggingPopup = false;
   }
+
   onContextMenu = (e) => {
     var draggable = document.getElementById("#draggable")
     draggable.style.transform = ""
@@ -165,7 +163,6 @@ class Board extends Component {
     draggable.style.display="inline-block"
     
     e.preventDefault();
-    
   }
 
   selectUniqueChanges(arr) {
@@ -181,11 +178,9 @@ class Board extends Component {
   }
 
   render() {
-
     const { boardState,draggablePos } = this.state;
     return (
       <div >
-        
         {boardState
           ? <div style={{"textAlign":"left"}}>
               <ToastContainer
@@ -220,13 +215,9 @@ class Board extends Component {
                   />
                   <div className="draggable-more">
                     <p>Coming soon..</p>
-                    <p>Coming soon..</p>
                   </div>
-                  
                 </div>
-
               </Draggable >
-              
               <table className="center">
                 <tbody>
                   {boardState.tiles.map((row, i) =>
@@ -237,10 +228,17 @@ class Board extends Component {
                     </tr>
                   )}
                 </tbody>
-
               </table>
             </div>
-          : <p>Loading...</p>}
+          :
+            <div class="centered-vh">
+              <RingLoader
+                sizeUnit={"px"}
+                size={125}
+                color={'#36D8B7'}
+              />
+            </div>
+        }
       </div>
     );
   }

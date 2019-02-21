@@ -1,4 +1,3 @@
-
 table.center {
     margin-left:auto;
     margin-right:auto;
@@ -45,4 +44,19 @@ div.handle-close {
 
 div.draggable-more {
   padding-left:10px;
+}
+
+.centered {
+  position: absolute;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.centered-vh {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
