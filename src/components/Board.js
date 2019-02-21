@@ -18,7 +18,6 @@ class Board extends Component {
       socket:null,
       boardLog: false,
       draggablePos: {x:100,y:100},
-      showDraggable: false
     };
     this.draggingPopup = false;
     this.pendingChanges= []
@@ -79,7 +78,7 @@ class Board extends Component {
       this.setState({boardState: desiredState});
     })
 
-    toast('🦄 Left click anywhere to begin drawing!', {
+    toast('Left click anywhere to begin drawing!', {
       position: "top-right",
       autoClose: 7000,
       hideProgressBar: false,
@@ -87,7 +86,7 @@ class Board extends Component {
       pauseOnHover: true,
       draggable: true,
     });
-    toast('🦄 Right click to open color picker!', {
+    toast('Right click to open color picker!', {
       position: "top-right",
       autoClose: 10000,
       hideProgressBar: false,
@@ -100,8 +99,7 @@ class Board extends Component {
 
   changeTileColor(x,y,e) {
     if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
-      console.log(e.buttons)
-      //do some stuff
+
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
       var tileUpdateData = {}
@@ -160,8 +158,12 @@ class Board extends Component {
     this.draggingPopup = false;
   }
   onContextMenu = (e) => {
-    this.setState({draggablePos:{x:e.pageX,y:e.pageY}});
-    this.setState({showDraggable: true});
+    var draggable = document.getElementById("#draggable")
+    draggable.style.transform = ""
+    draggable.style.top = e.clientY + "px"
+    draggable.style.left = e.clientX + "px"
+    draggable.style.display="inline-block"
+    
     e.preventDefault();
     
   }
@@ -180,12 +182,12 @@ class Board extends Component {
 
   render() {
 
-    const { boardState,draggablePos,showDraggable } = this.state;
+    const { boardState,draggablePos } = this.state;
     return (
       <div >
         
         {boardState
-          ? <div style={{"text-align":"left"}}>
+          ? <div style={{"textAlign":"left"}}>
               <ToastContainer
                 position="top-right"
                 autoClose={10000}
@@ -199,34 +201,31 @@ class Board extends Component {
                 />
                 {/* Same as */}
               <ToastContainer />
-            {showDraggable
-              ? <Draggable
-              handle=".handle"
-              defaultPosition={{x: draggablePos.x, y: draggablePos.y}}
-              bounds="parent"
-              position={null}
-              scale={1}
-              onStart={this.handleDragStart}
-              onDrag={this.handleDrag}
-              onStop={this.handleDragStop}
-            >
-              <div className="draggable-wrapper">
-                <div className="handle" onMouseOver={()=>{document.body.style.cursor = "move"}} onMouseOut={()=>{document.body.style.cursor = "default"}}>[+]</div>
-                <div className="handle-close" onMouseOver={()=>{document.body.style.cursor = "pointer"}} onMouseOut={()=>{document.body.style.cursor = "default"}} onClick={()=>{this.setState({showDraggable: false});document.body.style.cursor = "default"}}>[x]</div>
-                <SketchPicker
-                  color={ this.state.color }
-                  onChangeComplete={ this.handleColorPicker }
-                />
-                <div className="draggable-more">
-                  <p>Coming soon..</p>
-                  <p>Coming soon..</p>
+              <Draggable
+                handle=".handle"
+                defaultPosition={{x: draggablePos.x, y: draggablePos.y}}
+                bounds="parent"
+                position={null}
+                scale={1}
+                onStart={this.handleDragStart}
+                onDrag={this.handleDrag}
+                onStop={this.handleDragStop}
+              >
+                <div className="draggable-wrapper" id="#draggable">
+                  <div className="handle" onMouseOver={()=>{document.body.style.cursor = "move"}} onMouseOut={()=>{document.body.style.cursor = "default"}}>[+]</div>
+                  <div className="handle-close" onMouseOver={()=>{document.body.style.cursor = "pointer"}} onMouseOut={()=>{document.body.style.cursor = "default"}} onClick={(e)=>{e.currentTarget.parentElement.style.display="none"}}>[x]</div>
+                  <SketchPicker
+                    color={ this.state.color }
+                    onChangeComplete={ this.handleColorPicker }
+                  />
+                  <div className="draggable-more">
+                    <p>Coming soon..</p>
+                    <p>Coming soon..</p>
+                  </div>
+                  
                 </div>
-                
-              </div>
 
-            </Draggable >
-              : (null)
-            }
+              </Draggable >
               
               <table className="center">
                 <tbody>
