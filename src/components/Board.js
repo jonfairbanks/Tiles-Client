@@ -206,7 +206,7 @@ class Board extends Component {
                 onDrag={this.handleDrag}
                 onStop={this.handleDragStop}
               >
-                <div className="draggable-wrapper" id="#draggable">
+                <div className="draggable-wrapper" id="#draggable" style={{"display":"none"}}>
                   <div className="handle" onMouseOver={()=>{document.body.style.cursor = "move"}} onMouseOut={()=>{document.body.style.cursor = "default"}}>[+]</div>
                   <div className="handle-close" onMouseOver={()=>{document.body.style.cursor = "pointer"}} onMouseOut={()=>{document.body.style.cursor = "default"}} onClick={(e)=>{e.currentTarget.parentElement.style.display="none"}}>[x]</div>
                   <SketchPicker
