@@ -63,7 +63,6 @@ class Home extends Component {
             action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'Create a board', onClick: (e)=>this.createNewBoard(), onChange: (e)=>this.handleNameChange(e)}}
             defaultValue='Board Name'
             onChange={(e)=>this.handleNameChange(e)}
-            
           />
         </span>
         <br/>
