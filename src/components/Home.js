@@ -83,7 +83,7 @@ class Home extends Component {
                 const redirPath = "/" + board._id
                 return(
                   <span key={key} >
-                    <Link style={{color:"#707070", textAlign: "center", paddingLeft: "5px"}} to={redirPath}>{board.name}</Link>
+                    <Link style={{color:"#707070", textAlign: "center", paddingLeft: "5px", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
                     <br/>
                   </span>
                 )
@@ -111,7 +111,7 @@ class Home extends Component {
                 const redirPath = "/" + board._id
                 return(
                   <span key={key} >
-                    <Link style={{color:"#707070", textAlign: "center", paddingLeft: "5px"}} to={redirPath}>{board.name}</Link>
+                    <Link style={{color:"#707070", textAlign: "center", paddingLeft: "5px", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
                     <br/>
                   </span>
                 )
