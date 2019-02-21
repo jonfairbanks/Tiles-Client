@@ -52,7 +52,7 @@ class Home extends Component {
     return (
       <div className="App">
       <header className="App-header">
-          <h1 className="App-title">Tiles - Socket.io real time app</h1>
+          <h1 className="App-title">Tiles - Socket.io real time drawing app.</h1>
         </header>
         <span className="input-group-btn">
           <label>New Board Name:</label><input onChange={(e)=>this.handleNameChange(e)}></input>
