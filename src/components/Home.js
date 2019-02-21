@@ -3,7 +3,7 @@ import '../styles/App.css';
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { RingLoader } from 'react-spinners';
-import { Button } from 'semantic-ui-react';
+import { Button, Input } from 'semantic-ui-react';
 
 class Home extends Component {
   constructor() {
@@ -31,7 +31,7 @@ class Home extends Component {
   }
 
   handleNameChange = (e) => {
-    this.setState({newBoardName: e.target.value})
+    this.setState({newBoardName: e.target})
   }
 
   getAllBoards = () => {
@@ -58,10 +58,13 @@ class Home extends Component {
           <h1 className="App-title">Tiles</h1>
         </header>
         <span className="input-group-btn">
-          <label>New Board Name:</label><input onChange={(e)=>this.handleNameChange(e)}></input>
-          <Button inverted color='grey' onClick={(e)=>this.createNewBoard()}>
-            Create a board
-          </Button>
+          <Input
+            inverted
+            action={{ color: '#36D8B7', labelPosition: 'right', icon: 'plus', content: 'Create a board' }}
+            defaultValue='Board Name'
+            onChange={(e)=>this.handleNameChange(e)}
+            onClick={(e)=>this.createNewBoard()}
+          />
         </span> 
         <ul style={{"listStyle":"none"}}>
           {!this.state.data ? (
