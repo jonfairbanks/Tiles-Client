@@ -50,16 +50,25 @@ body {
 
 #left {
   float:left;
-  width: 33.3%;
-}
-
-#center {
-  display: inline-block;
-  margin: 0 auto;
-  width: 33.3%;
+  width: 50%;
 }
 
 #right {
   float: right;
-  width: 33.3%;
+  width: 50%;
+}
+
+.centered {
+  position: absolute;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.centered-vh {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
