@@ -60,7 +60,7 @@ class Home extends Component {
         <span className="input-group-btn">
           <Input
             inverted
-            action={{ color: '#36D8B7', labelPosition: 'right', icon: 'plus', content: 'Create a board' }}
+            action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'Create a board' }}
             defaultValue='Board Name'
             onChange={(e)=>this.handleNameChange(e)}
             onClick={(e)=>this.createNewBoard()}
