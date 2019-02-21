@@ -3,6 +3,7 @@ import '../styles/App.css';
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { RingLoader } from 'react-spinners';
+import { Button } from 'semantic-ui-react';
 
 class Home extends Component {
   constructor() {
@@ -12,13 +13,14 @@ class Home extends Component {
       newBoardName: "",
     };
   }
+  
   createNewBoard = () => {
     // Get all users from API
     axios
       .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: this.state.newBoardName, baseColor:"#222"})
       .then(res => {
         if(res.data.success){
-          this.props.history.push('/board/'+ res.data.boardId);
+          this.props.history.push('/'+ res.data.boardId);
         } else {
           console.log(res.data)
         }
@@ -27,9 +29,11 @@ class Home extends Component {
         console.log(error);
       })
   }
+
   handleNameChange = (e) => {
     this.setState({newBoardName: e.target.value})
   }
+
   getAllBoards = () => {
     // Get all users from API
     axios
@@ -55,7 +59,9 @@ class Home extends Component {
         </header>
         <span className="input-group-btn">
           <label>New Board Name:</label><input onChange={(e)=>this.handleNameChange(e)}></input>
-          <button onClick={(e)=>this.createNewBoard()}>Create new board</button>
+          <Button inverted color='grey' onClick={(e)=>this.createNewBoard()}>
+            Create a board
+          </Button>
         </span> 
         <ul style={{"listStyle":"none"}}>
           {!this.state.data ? (
@@ -68,10 +74,10 @@ class Home extends Component {
             </div>
           ) : 
             this.state.data.map((board, key) => {
-              const redirPath = "/board/" + board._id
+              const redirPath = "/" + board._id
               return(
                 <li key={key} >
-                  <i class="fas fa-chess-board"></i><Link to={redirPath}>{board.name}</Link>
+                  <Link to={redirPath}>{board.name}</Link>
                 </li>
               )
             })
