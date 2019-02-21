@@ -190,7 +190,7 @@ class Board extends Component {
                 newestOnTop={false}
                 closeOnClick
                 rtl={false}
-                pauseOnVisibilityChange
+                pauseOnVisibilityChange={false}
                 draggable
                 pauseOnHover
                 />
