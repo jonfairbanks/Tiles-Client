@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { RingLoader } from 'react-spinners';
 import { Input, Button, Divider, Form, Grid, Segment } from 'semantic-ui-react';
+import PNGImage from 'pnglib-es6';
+
 
 class Home extends Component {
   constructor() {
@@ -49,6 +51,17 @@ class Home extends Component {
   componentDidMount() {
     this.setState({ isFetching: true });
 		this.getAllBoards();
+  }
+
+  getBoardPng(tileData){
+    const image = new PNGImage(275, 135,16);
+    for (var x = 0; x < tileData.length; x++){
+      for (var y = 0; y < tileData[x].length; y++){
+        image.setPixel(y,x,image.createColor(tileData[x][y]))
+      }
+    }
+    const dataUri = image.getDataURL(); // data:image/png;base64,...
+    return dataUri;
   }
 
   render() {
@@ -118,6 +131,8 @@ class Home extends Component {
                 return(
                   <span key={key} >
                     <Link style={{color:"#707070", textAlign: "center", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
+                    <br/>
+                    <img src={this.getBoardPng(board.boardData)} style={{"border":"1px solid #FFF"}}/>
                     <br/>
                   </span>
                 )
