@@ -4,7 +4,6 @@ import '../styles/App.css';
 import Home from './Home';
 import Board from './Board';
 
-
 class App extends Component {
   render() {
     return (
@@ -12,7 +11,7 @@ class App extends Component {
         <Router>
           <div>
             <Route exact path="/" component={Home} />
-            <Route path="/board/:boardId" {...this.props} component={Board} />
+            <Route path="/:boardId" {...this.props} component={Board} />
           </div>
         </Router>
       </div>
