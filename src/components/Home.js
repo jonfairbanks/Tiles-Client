@@ -65,27 +65,61 @@ class Home extends Component {
             onChange={(e)=>this.handleNameChange(e)}
             
           />
-        </span> 
-        <ul style={{"listStyle":"none"}}>
-          {!this.state.data ? (
-            <div class="centered">
-              <RingLoader
-                sizeUnit={"px"}
-                size={25}
-                color={'#36D8B7'}
-              />
-            </div>
-          ) : 
-            this.state.data.map((board, key) => {
-              const redirPath = "/" + board._id
-              return(
-                <li key={key} >
-                  <Link to={redirPath}>{board.name}</Link>
-                </li>
-              )
-            })
-          }
-        </ul>
+        </span>
+        <br/>
+        <div id="container">
+          {/* LEFT SECTION */}
+          <div id="left">
+            <h3>Popular Boards</h3>
+            {!this.state.data ? (
+              <div class="centered">
+                <RingLoader
+                  sizeUnit={"px"}
+                  size={25}
+                  color={'#36D8B7'}
+                />
+              </div>
+            ) : 
+              this.state.data.map((board, key) => {
+                const redirPath = "/" + board._id
+                return(
+                  <span key={key} >
+                    <Link style={{color:"#707070", textAlign: "center", paddingLeft: "5px"}} to={redirPath}>{board.name}</Link>
+                    <br/>
+                  </span>
+                )
+              })
+            }
+          </div>
+          {/* CENTER SECTION */}
+          <div id="center">
+            <h3>Getting Started</h3>
+          </div>
+
+          {/* RIGHT SECTION */}
+          <div id="right">
+            <h3>Recent Boards</h3>
+            {!this.state.data ? (
+              <div class="centered">
+                <RingLoader
+                  sizeUnit={"px"}
+                  size={25}
+                  color={'#36D8B7'}
+                />
+              </div>
+            ) : 
+              this.state.data.map((board, key) => {
+                const redirPath = "/" + board._id
+                return(
+                  <span key={key} >
+                    <Link style={{color:"#707070", textAlign: "center", paddingLeft: "5px"}} to={redirPath}>{board.name}</Link>
+                    <br/>
+                  </span>
+                )
+              })
+            }
+          </div>
+        </div>
       </div>
     );
   }
