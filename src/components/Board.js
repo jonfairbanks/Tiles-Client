@@ -3,6 +3,7 @@ import '../styles/Board.css';
 import { SketchPicker } from 'react-color';
 import io from "socket.io-client";
 import axios from 'axios'
+import { Link } from 'react-router-dom'
 import Draggable from 'react-draggable'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -120,7 +121,6 @@ class Board extends Component {
 
   changeTileColorMouseMove(x,y,e) {
     if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
-      //do some stuff
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
       var tileUpdateData = {}
@@ -207,14 +207,17 @@ class Board extends Component {
                 onStop={this.handleDragStop}
               >
                 <div className="draggable-wrapper" id="#draggable" style={{"display":"none"}}>
-                  <div className="handle" onMouseOver={()=>{document.body.style.cursor = "move"}} onMouseOut={()=>{document.body.style.cursor = "default"}}>[+]</div>
-                  <div className="handle-close" onMouseOver={()=>{document.body.style.cursor = "pointer"}} onMouseOut={()=>{document.body.style.cursor = "default"}} onClick={(e)=>{e.currentTarget.parentElement.style.display="none"}}>[x]</div>
+                  <div className="handle" onMouseOver={()=>{document.body.style.cursor = "move"}} onMouseOut={()=>{document.body.style.cursor = "default"}}><i style={{color:"#707070"}} className="fas fa-arrows-alt"/></div>
+                  <div className="handle-close" onMouseOver={()=>{document.body.style.cursor = "pointer"}} onMouseOut={()=>{document.body.style.cursor = "default"}} onClick={(e)=>{e.currentTarget.parentElement.style.display="none"}}><i style={{color:"#707070"}} className="fas fa-times"/></div>
                   <SketchPicker
                     color={ this.state.color }
                     onChangeComplete={ this.handleColorPicker }
                   />
                   <div className="draggable-more">
-                    <p>Coming soon..</p>
+                  <span>
+                    <i style={{color:"#707070"}} className="fas fa-home"/>
+                    <Link style={{color:"#707070", textAlign: "center", fontSize: "16px", paddingLeft: "5px"}} to="/">Return Home</Link>
+                  </span>
                   </div>
                 </div>
               </Draggable >
