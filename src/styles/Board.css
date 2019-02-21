@@ -60,3 +60,13 @@ div.draggable-more {
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
 }
+
+#circle {
+  width: 25px;
+  height: 25px;
+  -webkit-border-radius: 25px;
+  -moz-border-radius: 25px;
+  border-radius: 25px;
+  background: #36D8B7;
+  float: left;
+}
