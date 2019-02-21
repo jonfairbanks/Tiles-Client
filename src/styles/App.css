@@ -15,10 +15,6 @@
   font-size: 2.5em;
 }
 
-h4 {
-  font-size: 2.5em;
-}
-
 .App-title {
   font-family: 'VT323', monospace;
   font-size: 2.5em;
@@ -36,10 +32,34 @@ h4 {
 body {
   background-color: #222222;
   color: #36D8B7;
+  font-family: 'Roboto', sans-serif;
 }
 @media screen and (prefers-color-scheme: light) {
   body {
     background-color: #36D8B7;
     color: #222222;
+    font-family: 'Roboto', sans-serif;
   }
+}
+
+#container {
+  width:100vw;
+  text-align: center;
+  padding-top: 25px;
+}
+
+#left {
+  float:left;
+  width: 33.3%;
+}
+
+#center {
+  display: inline-block;
+  margin: 0 auto;
+  width: 33.3%;
+}
+
+#right {
+  float: right;
+  width: 33.3%;
 }
