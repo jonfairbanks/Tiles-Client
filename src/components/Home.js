@@ -132,7 +132,7 @@ class Home extends Component {
                   {this.state.data.map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
-                      <div key={key} className="ui fluid image">
+                      <Link to={redirPath} key={key}>
                         <Image
                           src={this.getBoardPng(board.boardData)}
                           as='a'
@@ -141,8 +141,7 @@ class Home extends Component {
                           style={{"border":"1px solid #767676"}}
                           horizontal="true"
                         />
-                        <div style={{position: 'absolute', bottom: 0, width: '100%', height: 'auto'}}>{board.name}</div>
-                      </div>
+                      </Link>
                     )
                   })}
                 </StackGrid>
@@ -167,9 +166,16 @@ class Home extends Component {
                   {this.state.data.map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
-                      <li key={key} >
-                  <Link to={redirPath}>{board.name}</Link>
-                </li>
+                      <Link to={redirPath} key={key}>
+                        <Image
+                          src={this.getBoardPng(board.boardData)}
+                          as='a'
+                          href={redirPath}
+                          alt={"recent-" + board.name}
+                          style={{"border":"1px solid #767676"}}
+                          horizontal="true"
+                        />
+                      </Link>
                     )
                   })}
                 </StackGrid>
