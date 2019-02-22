@@ -130,15 +130,14 @@ class Home extends Component {
                   {this.state.data.map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
-                      <div className="ui fluid image">
+                      <div key={key} className="ui fluid image">
                         <Image
-                          key={key}
                           src={this.getBoardPng(board.boardData)}
                           as='a'
                           href={redirPath}
                           alt={"popular-" + board.name}
                           style={{"border":"1px solid #767676"}}
-                          horizontal={true}
+                          horizontal="true"
                         />
                         <div style={{position: 'absolute', bottom: 0, width: '100%', height: 'auto'}}>{board.name}</div>
                       </div>
@@ -173,7 +172,7 @@ class Home extends Component {
                         href={redirPath}
                         alt={"popular-" + board.name}
                         style={{"border":"1px solid #767676"}}
-                        horizontal={true}
+                        horizontal="true"
                       />
                     )
                   })}
