@@ -52,9 +52,11 @@ class Board extends Component {
       //console.log("Connected");
       socket.emit("joinChannel", this.props.match.params.boardId);
     })
+
     socket.on('updateConnections', newConnectionCount => {
       this.setState({userCount: newConnectionCount})
     })
+    
     socket.on("disconnect", () => {
       //console.log("Disconnected");
     });
@@ -64,6 +66,37 @@ class Board extends Component {
     const { socket} = this.state;
     socket.disconnect()
   }
+  componentDidMount() {
+    // DEFINE SOCKET EVENT LISTENERS
+    const { socket} = this.state;
+    socket.on("setBoardState", receivedState => {
+      this.setState({boardState: receivedState,userCount:receivedState.connections});
+    })
+
+    
+
+    toast('✏️ Click to begin drawing!', {
+      position: "bottom-right",
+      autoClose: 5500,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      type: toast.TYPE.SUCCESS
+    });
+
+    setTimeout(() => {
+      toast('🌈 Right click to change colors!', {
+        position: "bottom-right",
+        autoClose: 5500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        type: toast.TYPE.INFO
+      });
+    }, 12000);
+	}
 
   changeTileColor(x,y,e) {
     if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
@@ -87,6 +120,7 @@ class Board extends Component {
   }
 
   changeTileColorMouseMove(x,y,e) {
+    
     if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
@@ -104,10 +138,12 @@ class Board extends Component {
     }
   }
 
-  handleMouseUp(){
-    const { socket} = this.state;
-    socket.emit("updateTiles", this.props.match.params.boardId, this.selectUniqueChanges(this.pendingChanges))
-    this.pendingChanges= []
+  handleMouseUp(e){
+    if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
+      const { socket} = this.state;
+      socket.emit("updateTiles", this.props.match.params.boardId, this.selectUniqueChanges(this.pendingChanges))
+      this.pendingChanges= []
+    }
   }
 
   handleColorPicker = (color) => {
@@ -128,7 +164,6 @@ class Board extends Component {
     draggable.style.top = e.clientY + "px"
     draggable.style.left = e.clientX + "px"
     draggable.style.display="inline-block"
-    
     e.preventDefault();
   }
 
@@ -143,65 +178,6 @@ class Board extends Component {
     }
     return uniques;
   }
-
-  componentDidMount() {
-    // DEFINE SOCKET EVENT LISTENERS
-    const { socket} = this.state;
-    socket.on("setBoardState", receivedState => {
-      this.setState({boardState: receivedState});
-    })
-
-    socket.on("updateTiles", tileUpdateData => {
-      var desiredState = {...this.state.boardState}
-      for (var i = 0; i < tileUpdateData.length; i++ ){
-        desiredState.tiles[tileUpdateData[i].x][tileUpdateData[i].y] = tileUpdateData[i].color 
-      }
-      this.setState({boardState: desiredState});
-    })
-
-    toast('✏️ Click to begin drawing!', {
-      position: "bottom-right",
-      autoClose: 5500,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      type: toast.TYPE.SUCCESS
-    });
-
-    setTimeout(() => {
-      toast('🌈 Right click to change colors!', {
-        position: "bottom-right",
-        autoClose: 5500,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        type: toast.TYPE.INFO
-      });
-    }, 12000);
-
-    var isCtrl = false;
-    document.onkeyup=function(e){
-        if(e.keyCode === 17) isCtrl=false;
-    }
-
-    document.onkeydown=function(e){
-        if(e.keyCode === 17) isCtrl=true;
-        if(e.keyCode === 83 && isCtrl === true) {
-            toast('💾 Board Saved!', {
-              position: "bottom-right",
-              autoClose: 5500,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: false,
-              draggable: true,
-              type: toast.TYPE.SUCCESS
-            });
-            return false;
-        }
-    }
-	}
 
   render() {
     const { boardState,draggablePos } = this.state;
@@ -257,7 +233,7 @@ class Board extends Component {
                   {boardState.tiles.map((row, i) =>
                     <tr key={i}>
                       {row.map((col, j) =>
-                        <td key={j} onMouseMove={(e)=>{ this.changeTileColorMouseMove(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j,e) }} onMouseUp={()=>this.handleMouseUp()} onContextMenu={(e)=>{this.onContextMenu(e)}}bgcolor={col}></td>
+                        <td key={j} onMouseMove={(e)=>{ this.changeTileColorMouseMove(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j,e) }} onMouseUp={(e)=>this.handleMouseUp(e)} onContextMenu={(e)=>{this.onContextMenu(e)}}bgcolor={col}></td>
                       )}
                     </tr>
                   )}
