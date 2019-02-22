@@ -126,20 +126,22 @@ class Home extends Component {
               </div>
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
-                <StackGrid columnWidth={200}>
+                <StackGrid columnWidth={250}>
                   {this.state.data.map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
-                      <Image
-                        key={key}
-                        src={this.getBoardPng(board.boardData)}
-                        as='a'
-                        href={redirPath}
-                        target='_blank'
-                        alt={"popular-" + board.name}
-                        style={{"border":"1px solid #767676"}}
-                        horizontal={true}
-                      />
+                      <div className="ui fluid image">
+                        <Image
+                          key={key}
+                          src={this.getBoardPng(board.boardData)}
+                          as='a'
+                          href={redirPath}
+                          alt={"popular-" + board.name}
+                          style={{"border":"1px solid #767676"}}
+                          horizontal={true}
+                        />
+                        <div style={{position: 'absolute', bottom: 0, width: '100%', height: 'auto'}}>{board.name}</div>
+                      </div>
                     )
                   })}
                 </StackGrid>
@@ -160,7 +162,7 @@ class Home extends Component {
               </div>
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
-                <StackGrid columnWidth={200}>
+                <StackGrid columnWidth={250}>
                   {this.state.data.map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
@@ -169,7 +171,6 @@ class Home extends Component {
                         src={this.getBoardPng(board.boardData)}
                         as='a'
                         href={redirPath}
-                        target='_blank'
                         alt={"popular-" + board.name}
                         style={{"border":"1px solid #767676"}}
                         horizontal={true}
