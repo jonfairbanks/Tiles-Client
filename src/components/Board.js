@@ -19,7 +19,6 @@ class Board extends Component {
       color: '#FFF',
       socket:null,
       boardLog: false,
-      draggablePos: {x:100,y:100},
       userCount: 1,
     };
     this.draggingPopup = false;
@@ -139,7 +138,8 @@ class Board extends Component {
   }
 
   handleMouseUp(e){
-    if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
+    console.log(e.button)
+    if(e.button === 0){
       const { socket} = this.state;
       socket.emit("updateTiles", this.props.match.params.boardId, this.selectUniqueChanges(this.pendingChanges))
       this.pendingChanges= []
@@ -180,7 +180,7 @@ class Board extends Component {
   }
 
   render() {
-    const { boardState,draggablePos } = this.state;
+    const { boardState} = this.state;
     return (
       <div >
         {boardState
@@ -199,7 +199,7 @@ class Board extends Component {
               <ToastContainer />
               <Draggable
                 handle=".handle"
-                defaultPosition={{x: draggablePos.x, y: draggablePos.y}}
+                defaultPosition={{x: 0, y: 0}}
                 bounds="parent"
                 position={null}
                 scale={1}
@@ -208,7 +208,7 @@ class Board extends Component {
                 onStop={this.handleDragStop}
               >
                   <div className="draggable-wrapper" id="#draggable" style={{"display":"none"}}>
-                    <div className="handle" onMouseOver={()=>{document.body.style.cursor = "move"}} onMouseOut={()=>{document.body.style.cursor = "default"}}><i style={{color:"#707070"}} className="fas fa-arrows-alt"/></div>
+                    <div className="handle" ><i style={{color:"#707070"}} className="fas fa-arrows-alt"/></div>
                     <div className="handle-close" onMouseOver={()=>{document.body.style.cursor = "pointer"}} onMouseOut={()=>{document.body.style.cursor = "default"}} onClick={(e)=>{e.currentTarget.parentElement.style.display="none"}}><i style={{color:"#707070"}} className="fas fa-times"/></div>
                     <SketchPicker
                       color={ this.state.color }
