@@ -12,9 +12,8 @@ class Home extends Component {
     super();
     this.state = {
       isFetching: false,
-      newBoardName: "",
     };
-    var newBoardName = ""
+    this.newBoardName = ""
   }
   
   createNewBoard = () => {
@@ -135,8 +134,6 @@ class Home extends Component {
                       <Link to={redirPath} key={key}>
                         <Image
                           src={this.getBoardPng(board.boardData)}
-                          as='a'
-                          href={redirPath}
                           alt={"popular-" + board.name}
                           style={{"border":"1px solid #767676"}}
                           horizontal="true"
@@ -169,8 +166,6 @@ class Home extends Component {
                       <Link to={redirPath} key={key}>
                         <Image
                           src={this.getBoardPng(board.boardData)}
-                          as='a'
-                          href={redirPath}
                           alt={"recent-" + board.name}
                           style={{"border":"1px solid #767676"}}
                           horizontal="true"
