@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import '../styles/App.css';
 import axios from 'axios'
 import { RingLoader } from 'react-spinners';
+import { Link } from "react-router-dom";
 import { Input, Button, Divider, Form, Grid, Segment, Image } from 'semantic-ui-react';
 import PNGImage from 'pnglib-es6';
 import StackGrid from "react-stack-grid";
@@ -13,12 +14,13 @@ class Home extends Component {
       isFetching: false,
       newBoardName: "",
     };
+    var newBoardName = ""
   }
   
   createNewBoard = () => {
     // Get all users from API
     axios
-      .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: this.state.newBoardName, baseColor:"#222"})
+      .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: this.newBoardName, baseColor:"#222"})
       .then(res => {
         if(res.data.success){
           this.props.history.push('/'+ res.data.boardId);
@@ -32,7 +34,7 @@ class Home extends Component {
   }
 
   handleNameChange = (e) => {
-    this.setState({newBoardName: e.target.value})
+    this.newBoardName = e.target.value
   }
 
   getAllBoards = () => {
@@ -76,7 +78,7 @@ class Home extends Component {
                 <span className="input-group-btn">
                     <h2 style={{color:"#707070", textAlign: "center"}}>Get Started</h2>
                     <Input
-                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard(), onChange: (e)=>this.handleNameChange(e)}}
+                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard()}}
                       placeholder='Board Name'
                       onChange={(e)=>this.handleNameChange(e)}
                     />
@@ -165,15 +167,9 @@ class Home extends Component {
                   {this.state.data.map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
-                      <Image
-                        key={key}
-                        src={this.getBoardPng(board.boardData)}
-                        as='a'
-                        href={redirPath}
-                        alt={"popular-" + board.name}
-                        style={{"border":"1px solid #767676"}}
-                        horizontal="true"
-                      />
+                      <li key={key} >
+                  <Link to={redirPath}>{board.name}</Link>
+                </li>
                     )
                   })}
                 </StackGrid>
