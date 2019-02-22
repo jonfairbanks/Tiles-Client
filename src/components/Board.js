@@ -61,43 +61,6 @@ class Board extends Component {
     const { socket} = this.state;
     socket.disconnect()
   }
-  componentDidMount() {
-    // DEFINE SOCKET EVENT LISTENERS
-    const { socket} = this.state;
-    socket.on("setBoardState", receivedState => {
-      this.setState({boardState: receivedState});
-    })
-
-    socket.on("updateTiles", tileUpdateData => {
-      var desiredState = {...this.state.boardState}
-      for (var i = 0; i < tileUpdateData.length; i++ ){
-        desiredState.tiles[tileUpdateData[i].x][tileUpdateData[i].y] = tileUpdateData[i].color 
-      }
-      this.setState({boardState: desiredState});
-    })
-
-    toast('✏️ Click to begin drawing!', {
-      position: "bottom-right",
-      autoClose: 5500,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      type: toast.TYPE.SUCCESS
-    });
-
-    setTimeout(() => {
-      toast('🌈 Right click to change colors!', {
-        position: "bottom-right",
-        autoClose: 5500,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        type: toast.TYPE.INFO
-      });
-    }, 12000);
-	}
 
   changeTileColor(x,y,e) {
     if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
@@ -177,6 +140,65 @@ class Board extends Component {
     }
     return uniques;
   }
+
+  componentDidMount() {
+    // DEFINE SOCKET EVENT LISTENERS
+    const { socket} = this.state;
+    socket.on("setBoardState", receivedState => {
+      this.setState({boardState: receivedState});
+    })
+
+    socket.on("updateTiles", tileUpdateData => {
+      var desiredState = {...this.state.boardState}
+      for (var i = 0; i < tileUpdateData.length; i++ ){
+        desiredState.tiles[tileUpdateData[i].x][tileUpdateData[i].y] = tileUpdateData[i].color 
+      }
+      this.setState({boardState: desiredState});
+    })
+
+    toast('✏️ Click to begin drawing!', {
+      position: "bottom-right",
+      autoClose: 5500,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      type: toast.TYPE.SUCCESS
+    });
+
+    setTimeout(() => {
+      toast('🌈 Right click to change colors!', {
+        position: "bottom-right",
+        autoClose: 5500,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        type: toast.TYPE.INFO
+      });
+    }, 12000);
+
+    var isCtrl = false;
+    document.onkeyup=function(e){
+        if(e.keyCode === 17) isCtrl=false;
+    }
+
+    document.onkeydown=function(e){
+        if(e.keyCode === 17) isCtrl=true;
+        if(e.keyCode === 83 && isCtrl === true) {
+            toast('💾 Board Saved!', {
+              position: "bottom-right",
+              autoClose: 5500,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: true,
+              type: toast.TYPE.SUCCESS
+            });
+            return false;
+        }
+    }
+	}
 
   render() {
     const { boardState,draggablePos } = this.state;
