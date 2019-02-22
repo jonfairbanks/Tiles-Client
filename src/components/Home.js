@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import '../styles/App.css';
-import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { RingLoader } from 'react-spinners';
-import { Input, Button, Divider, Form, Grid, Segment } from 'semantic-ui-react';
+import { Input, Button, Divider, Form, Grid, Segment, Image } from 'semantic-ui-react';
 import PNGImage from 'pnglib-es6';
+import StackGrid from "react-stack-grid";
 
 class Home extends Component {
   constructor() {
@@ -126,17 +126,23 @@ class Home extends Component {
               </div>
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
-                {this.state.data.map((board, key) => {
-                  const redirPath = "/" + board._id
-                  return(
-                    <span key={key} >
-                      <Link style={{color:"#707070", textAlign: "center", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
-                      <br/>
-                      <img src={this.getBoardPng(board.boardData)} alt={"popular-" + this.state.newBoardName} style={{"border":"1px solid #FFF"}}/>
-                      <br/>
-                    </span>
-                  )
-                })}
+                <StackGrid columnWidth={200}>
+                  {this.state.data.map((board, key) => {
+                    const redirPath = "/" + board._id
+                    return(
+                      <Image
+                        key={key}
+                        src={this.getBoardPng(board.boardData)}
+                        as='a'
+                        href={redirPath}
+                        target='_blank'
+                        alt={"popular-" + board.name}
+                        style={{"border":"1px solid #767676"}}
+                        horizontal={true}
+                      />
+                    )
+                  })}
+                </StackGrid>
               </div>
             }
           </div>
@@ -152,16 +158,26 @@ class Home extends Component {
                   color={'#36D8B7'}
                 />
               </div>
-            ) : 
-              this.state.data.map((board, key) => {
-                const redirPath = "/" + board._id
-                return(
-                  <span key={key} >
-                    <Link style={{color:"#707070", textAlign: "center", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
-                    <br/>
-                  </span>
-                )
-              })
+            ) :
+              <div style={{height: '500px', overflowX: "hidden"}}>
+                <StackGrid columnWidth={200}>
+                  {this.state.data.map((board, key) => {
+                    const redirPath = "/" + board._id
+                    return(
+                      <Image
+                        key={key}
+                        src={this.getBoardPng(board.boardData)}
+                        as='a'
+                        href={redirPath}
+                        target='_blank'
+                        alt={"popular-" + board.name}
+                        style={{"border":"1px solid #767676"}}
+                        horizontal={true}
+                      />
+                    )
+                  })}
+                </StackGrid>
+              </div>
             }
           </div>
         </div>
