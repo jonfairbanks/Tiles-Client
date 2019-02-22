@@ -52,6 +52,9 @@ class Board extends Component {
       //console.log("Connected");
       socket.emit("joinChannel", this.props.match.params.boardId);
     })
+    socket.on('updateConnections', newConnectionCount => {
+      this.setState({userCount: newConnectionCount})
+    })
     socket.on("disconnect", () => {
       //console.log("Disconnected");
     });
@@ -262,7 +265,7 @@ class Board extends Component {
               </table>
             </div>
           :
-            <div class="centered-vh">
+            <div className="centered-vh">
               <RingLoader
                 sizeUnit={"px"}
                 size={125}
