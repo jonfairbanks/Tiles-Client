@@ -188,6 +188,8 @@ class Board extends Component {
   render() {
     const { boardState, visible } = this.state;
     return (
+      boardState
+            ? 
       <Sidebar.Pushable as={Segment}>
 
         {/* LEFT SIDEBAR */}
@@ -200,8 +202,10 @@ class Board extends Component {
           visible={visible}
           width='wide'
         >
-          <Menu.Item as='a' href='/'>
-            <h1 style={{color: "#36D8B7"}} className="App-title">Tiles</h1>
+          <Menu.Item>
+            <Link to={'/'}>
+              <h1 style={{color: "#36D8B7"}} className="App-title">Tiles</h1>
+            </Link>
           </Menu.Item>
           <Menu.Item as='a'>
             <Icon inverted style={{color: "#36D8B7"}} name='wrench' size='tiny' />
@@ -230,8 +234,7 @@ class Board extends Component {
         {/* MAIN CONTENT */}
         <Sidebar.Pusher>
           <Segment basic inverted style={{"padding":"0 0 0 0"}}>
-            {boardState
-            ? 
+            
               <div style={{"textAlign":"left"}}>
                 <ToastContainer
                   position="top-right"
@@ -257,19 +260,19 @@ class Board extends Component {
                   </tbody>
                 </table>
               </div>
-            :
-              <div className="centered-vh">
-                <RingLoader
-                  sizeUnit={"px"}
-                  size={125}
-                  color={'#36D8B7'}
-                />
-              </div>
-          }
+            
+          
           </Segment>
         </Sidebar.Pusher>
       </Sidebar.Pushable>
-    );
+    :
+    <div className="centered-vh">
+      <RingLoader
+        sizeUnit={"px"}
+        size={125}
+        color={'#36D8B7'}
+      />
+    </div>);
   }
 }
 export default Board;
