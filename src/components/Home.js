@@ -120,6 +120,7 @@ class Home extends Component {
           <Divider vertical>or</Divider>
         </Segment>
         <div id="container">
+
           {/* LEFT SECTION */}
           <div id="left">
             <h3>Popular Boards</h3>
@@ -128,7 +129,7 @@ class Home extends Component {
                 css={override}
                 sizeUnit={"px"}
                 size={40}
-                color={'#36D8B7'}
+                color={'#FFF'}
               />
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
@@ -166,7 +167,7 @@ class Home extends Component {
                 css={override}
                 sizeUnit={"px"}
                 size={40}
-                color={'#36D8B7'}
+                color={'#FFF'}
               />
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
