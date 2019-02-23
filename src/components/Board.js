@@ -87,7 +87,8 @@ class Board extends Component {
   }
 
   handleMouseUp(e){
-    if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
+    console.log(e.button)
+    if((e.button === 0) && this.draggingPopup === false){
       const { socket} = this.state;
       socket.emit("updateTiles", this.props.match.params.boardId, this.selectUniqueChanges(this.pendingChanges))
       this.pendingChanges= []
@@ -249,7 +250,7 @@ class Board extends Component {
                     {boardState.tiles.map((row, i) =>
                       <tr key={i}>
                         {row.map((col, j) =>
-                          <td key={j} onMouseMove={(e)=>{ this.changeTileColorMouseMove(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j,e) }} onMouseUp={(e)=>this.handleMouseUp(e)} onContextMenu={(e)=>{this.onContextMenu(e)}}bgcolor={col}></td>
+                          <td key={j} onMouseMove={(e)=>{ this.changeTileColorMouseMove(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j,e) }} onMouseUp={(e)=>{this.handleMouseUp(e)}} onContextMenu={(e)=>{this.onContextMenu(e)}}bgcolor={col}></td>
                         )}
                       </tr>
                     )}
