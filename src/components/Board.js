@@ -162,7 +162,7 @@ class Board extends Component {
       this.setState({boardState: receivedState,userCount:receivedState.connections});
     })
     toast('✏️ Click to begin drawing!', {
-      position: "bottom-right",
+      position: "top-right",
       autoClose: 5500,
       hideProgressBar: true,
       closeOnClick: true,
@@ -173,7 +173,7 @@ class Board extends Component {
 
     setTimeout(() => {
       toast('🌈 Right click to change colors!', {
-        position: "bottom-right",
+        position: "top-right",
         autoClose: 5500,
         hideProgressBar: true,
         closeOnClick: true,
