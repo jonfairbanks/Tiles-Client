@@ -87,7 +87,6 @@ class Board extends Component {
   }
 
   handleMouseUp(e){
-    console.log(e.button)
     if((e.button === 0) && this.draggingPopup === false){
       const { socket} = this.state;
       socket.emit("updateTiles", this.props.match.params.boardId, this.selectUniqueChanges(this.pendingChanges))
@@ -190,7 +189,7 @@ class Board extends Component {
     return (
       boardState
             ? 
-      <Sidebar.Pushable as={Segment}>
+      <Sidebar.Pushable as={Segment} style={{"border":"none","borderRadius":0}}>
 
         {/* LEFT SIDEBAR */}
         <Sidebar
