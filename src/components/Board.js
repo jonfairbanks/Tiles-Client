@@ -190,7 +190,7 @@ class Board extends Component {
     return (
       boardState
             ? 
-      <Sidebar.Pushable as={Segment}>
+      <Sidebar.Pushable as={Segment} style={{"border":"none","borderRadius":0}}>
 
         {/* LEFT SIDEBAR */}
         <Sidebar
