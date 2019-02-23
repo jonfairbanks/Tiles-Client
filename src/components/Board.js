@@ -83,7 +83,8 @@ class Board extends Component {
   }
 
   handleMouseUp(e){
-    if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
+    console.log(e.button)
+    if(e.button === 0){
       const { socket} = this.state;
       socket.emit("updateTiles", this.props.match.params.boardId, this.selectUniqueChanges(this.pendingChanges))
       this.pendingChanges= []
