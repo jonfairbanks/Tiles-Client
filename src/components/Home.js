@@ -171,7 +171,7 @@ class Home extends Component {
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
-                  {this.state.data.map((board, key) => {
+                  {this.state.data.slice(0).reverse().map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
                       <div
