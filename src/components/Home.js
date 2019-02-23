@@ -136,7 +136,7 @@ class Home extends Component {
                           src={this.getBoardPng(board.boardData)}
                           alt={"popular-" + board.name}
                           style={{"border":"1px solid #767676"}}
-                          horizontal="true"
+                          monitorImagesLoaded={true}   
                         />
                       </Link>
                     )
@@ -168,7 +168,7 @@ class Home extends Component {
                           src={this.getBoardPng(board.boardData)}
                           alt={"recent-" + board.name}
                           style={{"border":"1px solid #767676"}}
-                          horizontal="true"
+                          monitorImagesLoaded="true"
                         />
                       </Link>
                     )
