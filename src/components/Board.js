@@ -87,7 +87,6 @@ class Board extends Component {
   }
 
   handleMouseUp(e){
-    console.log(e.button)
     if((e.button === 0) && this.draggingPopup === false){
       const { socket} = this.state;
       socket.emit("updateTiles", this.props.match.params.boardId, this.selectUniqueChanges(this.pendingChanges))
@@ -188,7 +187,9 @@ class Board extends Component {
   render() {
     const { boardState, visible } = this.state;
     return (
-      <Sidebar.Pushable as={Segment}>
+      boardState
+            ? 
+      <Sidebar.Pushable as={Segment} style={{"border":"none","borderRadius":0}}>
 
         {/* LEFT SIDEBAR */}
         <Sidebar
@@ -200,8 +201,10 @@ class Board extends Component {
           visible={visible}
           width='wide'
         >
-          <Menu.Item as='a' href='/'>
-            <h1 style={{color: "#36D8B7"}} className="App-title">Tiles</h1>
+          <Menu.Item>
+            <Link to={'/'}>
+              <h1 style={{color: "#36D8B7"}} className="App-title">Tiles</h1>
+            </Link>
           </Menu.Item>
           <Menu.Item as='a'>
             <Icon inverted style={{color: "#36D8B7"}} name='wrench' size='tiny' />
@@ -230,8 +233,7 @@ class Board extends Component {
         {/* MAIN CONTENT */}
         <Sidebar.Pusher>
           <Segment basic inverted style={{"padding":"0 0 0 0"}}>
-            {boardState
-            ? 
+            
               <div style={{"textAlign":"left"}}>
                 <ToastContainer
                   position="top-right"
@@ -257,19 +259,19 @@ class Board extends Component {
                   </tbody>
                 </table>
               </div>
-            :
-              <div className="centered-vh">
-                <RingLoader
-                  sizeUnit={"px"}
-                  size={125}
-                  color={'#36D8B7'}
-                />
-              </div>
-          }
+            
+          
           </Segment>
         </Sidebar.Pusher>
       </Sidebar.Pushable>
-    );
+    :
+    <div className="centered-vh">
+      <RingLoader
+        sizeUnit={"px"}
+        size={125}
+        color={'#36D8B7'}
+      />
+    </div>);
   }
 }
 export default Board;
