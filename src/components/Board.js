@@ -215,7 +215,7 @@ class Board extends Component {
             <Icon inverted style={{color: "#36D8B7"}} name='users' size='tiny' />
             {this.state.userCount + " User(s)"}
           </Menu.Item>
-          <div className="centered" style={{margin: "12px 0"}}>
+          <div style={{margin: "12px 0"}}>
             <CompactPicker
               color={ this.state.color }
               onChangeComplete={ this.handleColorPicker }
