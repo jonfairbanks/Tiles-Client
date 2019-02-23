@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { Input, Button, Divider, Form, Grid, Segment, Image } from 'semantic-ui-react';
 import PNGImage from 'pnglib-es6';
 import StackGrid from "react-stack-grid";
+import { css } from '@emotion/core';
 
 class Home extends Component {
   constructor() {
@@ -65,6 +66,11 @@ class Home extends Component {
   }
 
   render() {
+    var override = css`
+      display: block;
+      margin: 0 auto;
+    `;
+
     return (
       <div className="App">
         <header className="App-header">
@@ -118,27 +124,33 @@ class Home extends Component {
           <div id="left">
             <h3>Popular Boards</h3>
             {!this.state.data ? (
-              <div className="centered">
-                <RingLoader
-                  sizeUnit={"px"}
-                  size={25}
-                  color={'#36D8B7'}
-                />
-              </div>
+              <RingLoader
+                css={override}
+                sizeUnit={"px"}
+                size={40}
+                color={'#36D8B7'}
+              />
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
                   {this.state.data.map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
-                      <Link to={redirPath} key={key}>
-                        <Image
-                          src={this.getBoardPng(board.boardData)}
-                          alt={"popular-" + board.name}
-                          style={{"border":"1px solid #767676"}}
-                          monitorImagesLoaded={true}   
-                        />
-                      </Link>
+                      <div
+                        style={{
+                          width: 250,
+                          height: 125,
+                        }}
+                      >
+                        <Link to={redirPath} key={key}>
+                          <Image
+                            src={this.getBoardPng(board.boardData)}
+                            alt={"popular-" + board.name}
+                            style={{"border":"1px solid #767676"}}
+                            monitorImagesLoaded={true}
+                          />
+                        </Link>
+                      </div>
                     )
                   })}
                 </StackGrid>
@@ -150,27 +162,33 @@ class Home extends Component {
           <div id="right">
             <h3>Recent Boards</h3>
             {!this.state.data ? (
-              <div className="centered">
-                <RingLoader
-                  sizeUnit={"px"}
-                  size={25}
-                  color={'#36D8B7'}
-                />
-              </div>
+              <RingLoader
+                css={override}
+                sizeUnit={"px"}
+                size={40}
+                color={'#36D8B7'}
+              />
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
                   {this.state.data.map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
-                      <Link to={redirPath} key={key}>
-                        <Image
-                          src={this.getBoardPng(board.boardData)}
-                          alt={"recent-" + board.name}
-                          style={{"border":"1px solid #767676"}}
-                          monitorImagesLoaded="true"
-                        />
-                      </Link>
+                      <div
+                        style={{
+                          width: 250,
+                          height: 125,
+                        }}
+                      >
+                        <Link to={redirPath} key={key}>
+                          <Image
+                            src={this.getBoardPng(board.boardData)}
+                            alt={"recent-" + board.name}
+                            style={{"border":"1px solid #767676"}}
+                            monitorImagesLoaded="true"
+                          />
+                        </Link>
+                      </div>
                     )
                   })}
                 </StackGrid>
