@@ -187,22 +187,22 @@ class Board extends Component {
           icon='labeled'
           inverted
           visible={visible}
-          width='thin'
+          width=' very thin'
         >
           <Menu.Item as='a' href='/'>
-            <Icon circular inverted color='teal' name='home' size='small' />
+            <Icon inverted color='teal' name='home' size='tiny' />
             Home
           </Menu.Item>
           <Menu.Item as='a'>
-            <Icon circular inverted color='teal' name='wrench' size='small' />
+            <Icon inverted color='teal' name='wrench' size='tiny' />
             Tools
           </Menu.Item>
           <Menu.Item as='a'>
-            <Icon circular inverted color='teal' name='share' size='small' />
+            <Icon inverted color='teal' name='share' size='tiny' />
             Share
           </Menu.Item>
           <Menu.Item as='a'>
-            <Icon circular inverted color='teal' name='users' size='small' />
+            <Icon inverted color='teal' name='users' size='tiny' />
             {this.state.userCount + " User(s)"}
           </Menu.Item>
         </Sidebar>
