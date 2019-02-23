@@ -1,15 +1,34 @@
 .rcw-opened {
-    width: 89% !important;
-  }
+  width: 89% !important;
+}
   
-  .rcw-header {
-    background-color: #36D8B7 !important;
-  }
-  
-  .rcw-launcher {
-    background-color: #36D8B7 !important;
-  }
-  
-  .rcw-message-text {
-    color: #222 !important;
-  }
+.rcw-header {
+  background-color: #333333 !important;
+  display: none !important;
+}
+
+.rcw-title {
+  background-color: #333333 !important;
+  padding: none !important;
+}
+
+.rcw-launcher {
+  background-color: #36D8B7 !important;
+}
+
+.rcw-message-text {
+  color: #222 !important;
+}
+
+.rcw-messages-container {
+  border-radius: "10px 10px 0 0" !important;
+  height: "25vh" !important;
+}
+
+.rcw-conversation-container {
+  box-shadow: none !important;
+}
+
+.rcw-hide-sm {
+  display: none !important;
+}

@@ -1,13 +1,17 @@
 import React, { Component } from "react";
-import '../styles/Board.css';
 import { CompactPicker } from 'react-color';
 import io from "socket.io-client";
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { RingLoader } from 'react-spinners';
 import { Icon, Menu, Segment, Sidebar } from 'semantic-ui-react';
+import { Widget, addResponseMessage } from 'react-chat-widget';
+
+import '../styles/Board.css';
+import '../styles/Chat.css';
+import 'react-toastify/dist/ReactToastify.css';
+import 'react-chat-widget/lib/styles.css';
 
 const socketUrl = "https://" + process.env.REACT_APP_API;
 
@@ -120,6 +124,12 @@ class Board extends Component {
     return uniques;
   }
 
+  handleNewUserMessage = (newMessage) => {
+    console.log(`New message incoming! ${newMessage}`);
+    // Now send the message throught the backend API
+    addResponseMessage(newMessage);
+  }
+
   componentWillMount() {
 		this.initSocket()
   }
@@ -146,6 +156,7 @@ class Board extends Component {
   }
 
   componentDidMount() {
+    addResponseMessage("Welcome to Tiles!");
     // DEFINE SOCKET EVENT LISTENERS
     const { socket} = this.state;
     socket.on("setBoardState", receivedState => {
@@ -183,52 +194,41 @@ class Board extends Component {
         <Sidebar
           as={Menu}
           animation='push'
-          direction='left'
-          vertical
+          direction='bottom'
           icon='labeled'
-          inverted
-          visible={visible}
-          width=' very thin'
-        >
-          <Menu.Item as='a' href='/'>
-            <Icon inverted color='teal' name='home' size='tiny' />
-            Home
-          </Menu.Item>
-          <Menu.Item as='a'>
-            <Icon inverted color='teal' name='wrench' size='tiny' />
-            Tools
-          </Menu.Item>
-          <Menu.Item as='a'>
-            <Icon inverted color='teal' name='share' size='tiny' />
-            Share
-          </Menu.Item>
-          <Menu.Item as='a'>
-            <Icon inverted color='teal' name='users' size='tiny' />
-            {this.state.userCount + " User(s)"}
-          </Menu.Item>
-        </Sidebar>
-
-        {/* RIGHT SIDEBAR */}
-        <Sidebar
-          as={Menu}
-          animation='push'
-          direction='right'
-          vertical
           inverted
           visible={visible}
           width='wide'
         >
-          <h1 className="App-title">Tiles</h1>
+          <Menu.Item as='a' href='/'>
+            <h1 style={{color: "#36D8B7"}} className="App-title">Tiles</h1>
+          </Menu.Item>
+          <Menu.Item as='a'>
+            <Icon inverted style={{color: "#36D8B7"}} name='wrench' size='tiny' />
+            Tools
+          </Menu.Item>
+          <Menu.Item as='a'>
+            <Icon inverted style={{color: "#36D8B7"}} name='share' size='tiny' />
+            Share
+          </Menu.Item>
+          <Menu.Item as='a'>
+            <Icon inverted style={{color: "#36D8B7"}} name='users' size='tiny' />
+            {this.state.userCount + " User(s)"}
+          </Menu.Item>
           <div style={{margin: "12px 0"}}>
             <CompactPicker
               color={ this.state.color }
               onChangeComplete={ this.handleColorPicker }
             />
           </div>
+          <Widget
+            handleNewUserMessage={this.handleNewUserMessage}
+            profileAvatar="https://picsum.photos/100/100/?random"
+          />
         </Sidebar>
 
         {/* MAIN CONTENT */}
-        <Sidebar.Pusher dimmed={visible}>
+        <Sidebar.Pusher>
           <Segment basic inverted style={{"padding":"0 0 0 0"}}>
             {boardState
             ? 
