@@ -221,7 +221,7 @@ class Board extends Component {
         >
           <Menu.Item>
             <Link to={'/'}>
-              <h1 style={{color: "#36D8B7"}} className="App-title">Tiles</h1>
+              <h1 style={{color: "#36D8B7"}} className="App-title">TILES</h1>
             </Link>
           </Menu.Item>
           <Menu.Item as='a'>

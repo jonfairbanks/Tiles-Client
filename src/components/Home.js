@@ -95,7 +95,7 @@ class Home extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Tiles</h1>
+          <h1 className="App-title">TILES</h1>
         </header>
         <Segment placeholder>
           <Grid columns={2} relaxed='very' stackable>
