@@ -161,27 +161,45 @@ class Board extends Component {
     socket.on("setBoardState", receivedState => {
       this.setState({boardState: receivedState,userCount:receivedState.connections});
     })
-    toast('✏️ Click to begin drawing!', {
+
+    const Msg1 = ({ closeToast }) => (
+      <div style={{margin: "10px 10px 10px 10px"}}>
+        <Icon inverted style={{float: "left", marginRight: "25px", color: "#36D8B7"}} name='pencil' size='large' />
+        <span><b>Click to begin drawing!</b></span>
+      </div>
+    )
+
+    const Msg2 = ({ closeToast }) => (
+      <div style={{margin: "10px 10px 10px 10px"}}>
+        <Icon inverted style={{float: "left", marginRight: "25px", color: "#36D8B7"}} name='paint brush' size='large' />
+        <span><b>Right click to change colors!</b></span>
+      </div>
+    )
+
+    toast(<Msg1 />, {
       position: "top-right",
-      autoClose: 5500,
+      autoClose: 5000,
       hideProgressBar: true,
       closeOnClick: true,
       pauseOnHover: false,
       draggable: true,
-      type: toast.TYPE.SUCCESS
+      pauseOnVisibilityChange: false,
+      className: 'toast1',
+      bodyClassName: "toast1-body",
+      progressClassName: 'toast1-progress'
     });
 
     setTimeout(() => {
-      toast('🌈 Right click to change colors!', {
+      toast(<Msg2 />, {
         position: "top-right",
         autoClose: 5500,
         hideProgressBar: true,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: true,
-        type: toast.TYPE.INFO
+        pauseOnVisibilityChange: false,
       });
-    }, 12000);
+    }, 11000);
 	}
 
   render() {
@@ -258,6 +276,9 @@ class Board extends Component {
                     )}
                   </tbody>
                 </table>
+                <div>
+                  Share
+                </div>
               </div>
             
           
