@@ -7,6 +7,7 @@ import { Input, Button, Divider, Form, Grid, Segment, Image } from 'semantic-ui-
 import PNGImage from 'pnglib-es6';
 import StackGrid from "react-stack-grid";
 import { css } from '@emotion/core';
+import moment from 'moment';
 
 class Home extends Component {
   constructor() {
@@ -49,11 +50,6 @@ class Home extends Component {
       })
   }
 
-  componentDidMount() {
-    this.setState({ isFetching: true });
-		this.getAllBoards();
-  }
-
   scaleApply(array, factor) {
     const scaled = [];
     for(const row of array) {
@@ -80,6 +76,11 @@ class Home extends Component {
     }
     const dataUri = image.getDataURL(); // data:image/png;base64,...
     return dataUri;
+  }
+  
+  componentDidMount() {
+    this.setState({ isFetching: true });
+    this.getAllBoards();
   }
 
   render() {
@@ -140,7 +141,7 @@ class Home extends Component {
 
           {/* LEFT SECTION */}
           <div id="left">
-            <h3>Popular Boards</h3>
+            <h3 style={{fontSize: "1.5em"}}>Popular Boards</h3>
             {!this.state.data ? (
               <RingLoader
                 css={override}
@@ -151,7 +152,7 @@ class Home extends Component {
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
-                  {this.state.data.map((board, key) => {
+                  {this.state.data.sort((a, b) => {return b.boardLog.length - a.boardLog.length}).map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
                       <div
@@ -159,15 +160,17 @@ class Home extends Component {
                           width: 250,
                           height: 125,
                         }}
+                        key={key}
                       >
-                        <Link to={redirPath} key={key}>
+                        <Link to={redirPath}>
                           <Image
                             src={this.getBoardPng(board.boardData)}
                             alt={"popular-" + board.name}
                             style={{"border":"1px solid #767676"}}
-                            monitorImagesLoaded={true}
                           />
                         </Link>
+                        <b>{board.name}</b><br/>
+                        <span style={{color: "#666666"}}>{board.boardLog.length.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " edits"}</span>
                       </div>
                     )
                   })}
@@ -178,7 +181,7 @@ class Home extends Component {
 
           {/* RIGHT SECTION */}
           <div id="right">
-            <h3>Recent Boards</h3>
+            <h3 style={{fontSize: "1.5em"}}>Recent Boards</h3>
             {!this.state.data ? (
               <RingLoader
                 css={override}
@@ -189,23 +192,30 @@ class Home extends Component {
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
-                  {this.state.data.slice(0).reverse().map((board, key) => {
-                    const redirPath = "/" + board._id
+                  {this.state.data.sort((a, b) => {return b.dateCreated - a.dateCreated}).map((board, key) => {
+                    var redirPath = "/" + board._id
+                    //var minutesPassed = moment().diff(board.dateCreated, 'minutes');
+                    var now = moment();
+                    var then = moment(board.dateCreated);
+                    var timeElapsed = then.from(now);
                     return(
                       <div
                         style={{
                           width: 250,
                           height: 125,
                         }}
+                        key={key}
                       >
-                        <Link to={redirPath} key={key}>
+                        <Link to={redirPath}>
                           <Image
                             src={this.getBoardPng(board.boardData)}
                             alt={"recent-" + board.name}
                             style={{"border":"1px solid #767676"}}
-                            monitorImagesLoaded="true"
                           />
                         </Link>
+                        <b>{board.name}</b><br/>
+                        <span style={{color: "#666666"}}>{"Created " + timeElapsed}</span>
+                        <br/>
                       </div>
                     )
                   })}
