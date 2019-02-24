@@ -234,7 +234,10 @@ class Board extends Component {
           </Menu.Item>
           <Menu.Item as='a'>
             <Icon inverted style={{color: "#36D8B7"}} name='users' size='tiny' />
-            {this.state.userCount + " User(s)"}
+            {this.state.userCount > 1
+              ? this.state.userCount + " Users"
+              : this.state.userCount + " User"
+            }
           </Menu.Item>
           <div style={{margin: "12px 0"}}>
             <CompactPicker
