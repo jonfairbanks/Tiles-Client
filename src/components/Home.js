@@ -54,15 +54,36 @@ class Home extends Component {
 		this.getAllBoards();
   }
 
-  getBoardPng(tileData){
-    const image = new PNGImage(275, 135,16);
-    for (var x = 0; x < tileData.length; x++){
-      for (var y = 0; y < tileData[x].length; y++){
-        image.setPixel(y,x,image.createColor(tileData[x][y]))
-      }
+  scaleApply(array, factor) {
+    const scaled = [];
+    for(const row of array) {
+      let x = [];
+      for(const item of row)
+        x.push.apply(x, Array(factor).fill(item));
+      scaled.push.apply(scaled, Array(factor).fill(x));
     }
+    return scaled;
+  }
+  
+  getBoardPng(tileData, scale){
+    if(scale){
+      tileData = this.scaleApply(tileData, scale)
+    }
+
+    const image = new PNGImage(tileData[0].length, tileData.length, 135,16);
+    //columns
+    for (var y = 0; y < tileData.length; y++){
+      //rows
+      for (var x = 0; x < tileData[y].length; x++){
+        //set pixel
+        image.setPixel(x,y,image.createColor(tileData[y][x]))
+      }
+
+    }
+
     const dataUri = image.getDataURL(); // data:image/png;base64,...
     return dataUri;
+    
   }
 
   render() {
