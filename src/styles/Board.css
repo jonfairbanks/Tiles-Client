@@ -70,3 +70,12 @@ div.draggable-more {
   background: #36D8B7;
   float: left;
 }
+
+.Toastify__toast--default {
+  background: #666666 !important;
+}
+
+.Toastify__toast-body { 
+  font-family:  'Roboto', sans-serif; 
+  background-color: #666666;
+}
