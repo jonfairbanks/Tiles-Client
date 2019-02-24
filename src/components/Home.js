@@ -192,7 +192,7 @@ class Home extends Component {
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
-                  {this.state.data.sort((a, b) => {return b.dateCreated - a.dateCreated}).map((board, key) => {
+                  {this.state.data.sort((a, b) => {return moment(b.dateCreated) - moment(a.dateCreated)}).map((board, key) => {
                     var redirPath = "/" + board._id
                     //var minutesPassed = moment().diff(board.dateCreated, 'minutes');
                     var now = moment();
