@@ -69,7 +69,6 @@ class Home extends Component {
     if(scale){
       tileData = this.scaleApply(tileData, scale)
     }
-
     const image = new PNGImage(tileData[0].length, tileData.length, 135,16);
     //columns
     for (var y = 0; y < tileData.length; y++){
@@ -78,12 +77,9 @@ class Home extends Component {
         //set pixel
         image.setPixel(x,y,image.createColor(tileData[y][x]))
       }
-
     }
-
     const dataUri = image.getDataURL(); // data:image/png;base64,...
     return dataUri;
-    
   }
 
   render() {
