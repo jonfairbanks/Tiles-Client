@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { CompactPicker } from 'react-color';
 import io from "socket.io-client";
 import axios from 'axios'
-import { Link } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify';
 import { RingLoader } from 'react-spinners';
 import { Icon, Menu, Segment, Sidebar } from 'semantic-ui-react';
@@ -21,7 +20,7 @@ class Board extends Component {
     this.state = {
       boardState: false,
       color: '#FFF',
-      socket:null,
+      socket: null,
       boardLog: false,
       userCount: 1,
       visible: false
@@ -205,8 +204,7 @@ class Board extends Component {
   render() {
     const { boardState, visible } = this.state;
     return (
-      boardState
-            ? 
+      boardState ? 
       <Sidebar.Pushable as={Segment} style={{"border":"none","borderRadius":0}}>
 
         {/* LEFT SIDEBAR */}
@@ -219,10 +217,8 @@ class Board extends Component {
           visible={visible}
           width='wide'
         >
-          <Menu.Item>
-            <Link to={'/'}>
-              <h1 style={{color: "#36D8B7"}} className="App-title">TILES</h1>
-            </Link>
+          <Menu.Item as="a" href='/'>
+            <h1 style={{color: "#36D8B7"}} className="App-title">TILES</h1>
           </Menu.Item>
           <Menu.Item as='a'>
             <Icon inverted style={{color: "#36D8B7"}} name='wrench' size='tiny' />
@@ -254,7 +250,6 @@ class Board extends Component {
         {/* MAIN CONTENT */}
         <Sidebar.Pusher>
           <Segment basic inverted style={{"padding":"0 0 0 0"}}>
-            
               <div style={{"textAlign":"left"}}>
                 <ToastContainer
                   position="top-right"
@@ -279,12 +274,7 @@ class Board extends Component {
                     )}
                   </tbody>
                 </table>
-                <div>
-                  Share
-                </div>
               </div>
-            
-          
           </Segment>
         </Sidebar.Pusher>
       </Sidebar.Pushable>
