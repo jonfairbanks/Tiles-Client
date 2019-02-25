@@ -8,33 +8,48 @@ import PNGImage from 'pnglib-es6';
 import StackGrid from "react-stack-grid";
 import { css } from '@emotion/core';
 import moment from 'moment';
+import Filter from 'bad-words';
+
+var filter = new Filter();
+filter.addWords('maga'); // Items listed here will be replaced with ****
+filter.removeWords('hells'); // Items listed here will NOT be filtered
 
 class Home extends Component {
   constructor() {
     super();
     this.state = {
       isFetching: false,
+      error: false
     };
     this.newBoardName = ""
   }
   
   createNewBoard = () => {
-    // Get all users from API
-    axios
-      .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: this.newBoardName, baseColor:"#222"})
-      .then(res => {
-        if(res.data.success){
-          this.props.history.push('/'+ res.data.boardId);
-        } else {
-          console.log(res.data)
-        }
-      })
-      .catch(error => {
-        console.log(error);
-      })
+    if(filter.isProfane(this.newBoardName)){}else{
+      var name = filter.clean(this.newBoardName);
+      var color = "#222";
+      // Get all users from API
+      axios
+        .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: name, baseColor: color})
+        .then(res => {
+          if(res.data.success){
+            this.props.history.push('/'+ res.data.boardId);
+          } else {
+            console.log(res.data)
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        })
+    }
   }
 
   handleNameChange = (e) => {
+    if(filter.isProfane(e.target.value)){
+      this.setState({error: true});
+    }else{
+      this.setState({error: false});
+    }
     this.newBoardName = e.target.value
   }
 
@@ -66,11 +81,11 @@ class Home extends Component {
       tileData = this.scaleApply(tileData, scale)
     }
     const image = new PNGImage(tileData[0].length, tileData.length, 135,16);
-    //columns
+    // Columns
     for (var y = 0; y < tileData.length; y++){
-      //rows
+      // Rows
       for (var x = 0; x < tileData[y].length; x++){
-        //set pixel
+        // Set pixels
         image.setPixel(x,y,image.createColor(tileData[y][x]))
       }
     }
@@ -84,6 +99,8 @@ class Home extends Component {
   }
 
   render() {
+    const { error } = this.state;
+
     var override = css`
       display: block;
       margin: 0 auto;
@@ -101,7 +118,8 @@ class Home extends Component {
                 <span className="input-group-btn">
                     <h2 style={{color:"#707070", textAlign: "center"}}>Get Started</h2>
                     <Input
-                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard()}}
+                      error={error}
+                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard()} }
                       placeholder='Board Name'
                       onChange={(e)=>this.handleNameChange(e)}
                     />
@@ -152,13 +170,13 @@ class Home extends Component {
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
-                  {this.state.data.sort((a, b) => {return b.boardLog.length - a.boardLog.length}).map((board, key) => {
+                  {this.state.data.sort((a, b) => {return b.boardLog.length - a.boardLog.length}).slice(0,21).map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
                       <div
                         style={{
                           width: 250,
-                          height: 125,
+                          height: 175,
                         }}
                         key={key}
                       >
@@ -192,17 +210,14 @@ class Home extends Component {
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
-                  {this.state.data.sort((a, b) => {return moment(b.dateCreated) - moment(a.dateCreated)}).map((board, key) => {
+                  {this.state.data.sort((a, b) => {return moment(b.dateCreated) - moment(a.dateCreated)}).slice(0,21).map((board, key) => {
                     var redirPath = "/" + board._id
-                    //var minutesPassed = moment().diff(board.dateCreated, 'minutes');
-                    var now = moment();
-                    var then = moment(board.dateCreated);
-                    var timeElapsed = then.from(now);
+                    var timeElapsed = moment(board.dateCreated).from(moment());
                     return(
                       <div
                         style={{
                           width: 250,
-                          height: 125,
+                          height: 175,
                         }}
                         key={key}
                       >
