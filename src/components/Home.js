@@ -152,13 +152,13 @@ class Home extends Component {
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
-                  {this.state.data.sort((a, b) => {return b.boardLog.length - a.boardLog.length}).map((board, key) => {
+                  {this.state.data.sort((a, b) => {return b.boardLog.length - a.boardLog.length}).slice(0,21).map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
                       <div
                         style={{
                           width: 250,
-                          height: 125,
+                          height: 175,
                         }}
                         key={key}
                       >
@@ -192,14 +192,14 @@ class Home extends Component {
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
-                  {this.state.data.sort((a, b) => {return moment(b.dateCreated) - moment(a.dateCreated)}).map((board, key) => {
+                  {this.state.data.sort((a, b) => {return moment(b.dateCreated) - moment(a.dateCreated)}).slice(0,21).map((board, key) => {
                     var redirPath = "/" + board._id
                     var timeElapsed = moment(board.dateCreated).from(moment());
                     return(
                       <div
                         style={{
                           width: 250,
-                          height: 125,
+                          height: 175,
                         }}
                         key={key}
                       >
