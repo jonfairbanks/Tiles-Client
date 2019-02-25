@@ -165,7 +165,7 @@ class Home extends Component {
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
-                  {this.state.data.sort((a, b) => {return b.boardLog.length - a.boardLog.length}).slice(0,21).map((board, key) => {
+                  {this.state.data.filter(board => board.boardLog.length > 0).sort((a, b) => {return b.boardLog.length - a.boardLog.length}).slice(0,21).map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
                       <div
