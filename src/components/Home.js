@@ -12,7 +12,7 @@ import Filter from 'bad-words';
 
 var filter = new Filter();
 filter.addWords('maga'); // Items listed here will be replaced with ****
-filter.removeWords('hells'); // Items listed here will NOT be filtered
+filter.removeWords('hells', 'god'); // Items listed here will NOT be filtered
 
 class Home extends Component {
   constructor() {
@@ -25,8 +25,8 @@ class Home extends Component {
   }
   
   createNewBoard = () => {
-    if(filter.isProfane(this.newBoardName)){}else{
-      var name = filter.clean(this.newBoardName);
+    if(filter.isProfane(this.newBoardName)){this.setState({error: true});alert("This board name is not supported.")}else{
+      var name = this.newBoardName;
       var color = "#222";
       // Get all users from API
       axios
@@ -45,11 +45,6 @@ class Home extends Component {
   }
 
   handleNameChange = (e) => {
-    if(filter.isProfane(e.target.value)){
-      this.setState({error: true});
-    }else{
-      this.setState({error: false});
-    }
     this.newBoardName = e.target.value
   }
 
@@ -170,7 +165,7 @@ class Home extends Component {
             ) :
               <div style={{height: '500px', overflowX: "hidden"}}>
                 <StackGrid columnWidth={250}>
-                  {this.state.data.sort((a, b) => {return b.boardLog.length - a.boardLog.length}).slice(0,21).map((board, key) => {
+                  {this.state.data.filter(board => board.boardLog.length > 0).sort((a, b) => {return b.boardLog.length - a.boardLog.length}).slice(0,21).map((board, key) => {
                     const redirPath = "/" + board._id
                     return(
                       <div
