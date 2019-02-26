@@ -7,6 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { RingLoader } from 'react-spinners';
 import { Icon, Menu, Segment, Sidebar } from 'semantic-ui-react';
 import { Widget, addResponseMessage } from 'react-chat-widget';
+import PNGImage from 'pnglib-es6';
 
 import '../styles/Board.css';
 import '../styles/Chat.css';
@@ -154,6 +155,53 @@ class Board extends Component {
     socket.disconnect()
   }
 
+  scaleApply(array, factor) {
+    const scaled = [];
+    for(const row of array) {
+      let x = [];
+      for(const item of row)
+        x.push.apply(x, Array(factor).fill(item));
+      scaled.push.apply(scaled, Array(factor).fill(x));
+    }
+    return scaled;
+  }
+  
+  getBoardPng(tileData, scale){
+    if(scale){
+      tileData = this.scaleApply(tileData, scale)
+    }
+
+    const image = new PNGImage(tileData[0].length, tileData.length,16);
+    //columns
+    for (var y = 0; y < tileData.length; y++){
+      //rows
+      for (var x = 0; x < tileData[y].length; x++){
+        //set pixel
+        image.setPixel(x,y,image.createColor(tileData[y][x]))
+      }
+
+    }
+
+    const dataUri = image.getDataURL(); // data:image/png;base64,...
+    return dataUri;
+    
+  }
+
+  download(filename, dataUri) {
+    var pom = document.createElement('a');
+    pom.setAttribute('href', dataUri);
+    pom.setAttribute('download', filename);
+
+    if (document.createEvent) {
+        var event = document.createEvent('MouseEvents');
+        event.initEvent('click', true, true);
+        pom.dispatchEvent(event);
+    }
+    else {
+        pom.click();
+    }
+  }
+
   componentDidMount() {
     addResponseMessage("Welcome to Tiles!");
     // DEFINE SOCKET EVENT LISTENERS
@@ -239,6 +287,12 @@ class Board extends Component {
               : this.state.userCount + " User"
             }
           </Menu.Item>
+
+          <Menu.Item onClick={(e)=>this.download("download.png", this.getBoardPng(boardState.tiles,5))}>
+            <Icon inverted style={{color: "#36D8B7"}} name='save' size='tiny' />
+            Save Image
+          </Menu.Item>
+
           <div style={{margin: "12px 0"}}>
             <CompactPicker
               color={ this.state.color }
