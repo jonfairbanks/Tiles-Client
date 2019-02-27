@@ -1,38 +1,51 @@
 import React, { Component } from 'react';
 import '../styles/App.css';
-import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { RingLoader } from 'react-spinners';
-import { Input, Button, Divider, Form, Grid, Segment } from 'semantic-ui-react';
+import { Link } from "react-router-dom";
+import { Input, Button, Divider, Form, Grid, Segment, Image } from 'semantic-ui-react';
 import PNGImage from 'pnglib-es6';
+import StackGrid from "react-stack-grid";
+import { css } from '@emotion/core';
+import moment from 'moment';
+import Filter from 'bad-words';
+
+var filter = new Filter();
+filter.addWords('maga'); // Items listed here will be replaced with ****
+filter.removeWords('hells', 'god'); // Items listed here will NOT be filtered
 
 class Home extends Component {
   constructor() {
     super();
     this.state = {
       isFetching: false,
-      newBoardName: "",
+      error: false
     };
+    this.newBoardName = ""
   }
   
   createNewBoard = () => {
-    // Get all users from API
-    axios
-      .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: this.state.newBoardName, baseColor:"#222"})
-      .then(res => {
-        if(res.data.success){
-          this.props.history.push('/'+ res.data.boardId);
-        } else {
-          console.log(res.data)
-        }
-      })
-      .catch(error => {
-        console.log(error);
-      })
+    if(filter.isProfane(this.newBoardName)){this.setState({error: true});alert("This board name is not supported.")}else{
+      var name = this.newBoardName;
+      var color = "#222";
+      // Get all users from API
+      axios
+        .post('https://' + process.env.REACT_APP_API + '/tiles',  {name: name, baseColor: color})
+        .then(res => {
+          if(res.data.success){
+            this.props.history.push('/'+ res.data.boardId);
+          } else {
+            console.log(res.data)
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        })
+    }
   }
 
   handleNameChange = (e) => {
-    this.setState({newBoardName: e.target.value})
+    this.newBoardName = e.target.value
   }
 
   getAllBoards = () => {
@@ -47,27 +60,51 @@ class Home extends Component {
       })
   }
 
-  componentDidMount() {
-    this.setState({ isFetching: true });
-		this.getAllBoards();
+  scaleApply(array, factor) {
+    const scaled = [];
+    for(const row of array) {
+      let x = [];
+      for(const item of row)
+        x.push.apply(x, Array(factor).fill(item));
+      scaled.push.apply(scaled, Array(factor).fill(x));
+    }
+    return scaled;
   }
-
-  getBoardPng(tileData){
-    const image = new PNGImage(275, 135,16);
-    for (var x = 0; x < tileData.length; x++){
-      for (var y = 0; y < tileData[x].length; y++){
-        image.setPixel(y,x,image.createColor(tileData[x][y]))
+  
+  getBoardPng(tileData, scale){
+    if(scale){
+      tileData = this.scaleApply(tileData, scale)
+    }
+    const image = new PNGImage(tileData[0].length, tileData.length, 135,16);
+    // Columns
+    for (var y = 0; y < tileData.length; y++){
+      // Rows
+      for (var x = 0; x < tileData[y].length; x++){
+        // Set pixels
+        image.setPixel(x,y,image.createColor(tileData[y][x]))
       }
     }
     const dataUri = image.getDataURL(); // data:image/png;base64,...
     return dataUri;
   }
+  
+  componentDidMount() {
+    this.setState({ isFetching: true });
+    this.getAllBoards();
+  }
 
   render() {
+    const { error } = this.state;
+
+    var override = css`
+      display: block;
+      margin: 0 auto;
+    `;
+
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Tiles</h1>
+          <h1 className="App-title">TILES</h1>
         </header>
         <Segment placeholder>
           <Grid columns={2} relaxed='very' stackable>
@@ -76,7 +113,8 @@ class Home extends Component {
                 <span className="input-group-btn">
                     <h2 style={{color:"#707070", textAlign: "center"}}>Get Started</h2>
                     <Input
-                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard(), onChange: (e)=>this.handleNameChange(e)}}
+                      error={error}
+                      action={{ color: 'grey', labelPosition: 'right', icon: 'plus', content: 'New Board', onClick: (e)=>this.createNewBoard()} }
                       placeholder='Board Name'
                       onChange={(e)=>this.handleNameChange(e)}
                     />
@@ -95,7 +133,7 @@ class Home extends Component {
                   <div style={{float: "left", paddingRight: "15px"}}>
                     <Form.Input icon='user' iconPosition='left' label='Username' placeholder='Username' />
                   </div>
-                  <div style={{float: "left", paddingRight: "15px", paddingBottom: "13px"}}>
+                  <div style={{float: "left", paddingRight: "15px", paddingBottom: "15px"}}>
                     <Form.Input icon='lock' iconPosition='left' label='Password' placeholder='Password' type='password' />
                   </div>
                   <br/>
@@ -113,53 +151,86 @@ class Home extends Component {
           <Divider vertical>or</Divider>
         </Segment>
         <div id="container">
+
           {/* LEFT SECTION */}
           <div id="left">
-            <h3>Popular Boards</h3>
+            <h3 style={{fontSize: "1.5em"}}>Popular Boards</h3>
             {!this.state.data ? (
-              <div className="centered">
-                <RingLoader
-                  sizeUnit={"px"}
-                  size={25}
-                  color={'#36D8B7'}
-                />
+              <RingLoader
+                css={override}
+                sizeUnit={"px"}
+                size={40}
+                color={'#FFF'}
+              />
+            ) :
+              <div style={{height: '500px', overflowX: "hidden"}}>
+                <StackGrid columnWidth={250}>
+                  {this.state.data.filter(board => board.boardLog.length > 0).sort((a, b) => {return b.boardLog.length - a.boardLog.length}).slice(0,21).map((board, key) => {
+                    const redirPath = "/" + board._id
+                    return(
+                      <div
+                        style={{
+                          width: 250,
+                          height: 175,
+                        }}
+                        key={key}
+                      >
+                        <Link to={redirPath}>
+                          <Image
+                            src={this.getBoardPng(board.boardData)}
+                            alt={"popular-" + board.name}
+                            style={{"border":"1px solid #767676"}}
+                          />
+                        </Link>
+                        <b>{board.name}</b><br/>
+                        <span style={{color: "#666666"}}>{board.boardLog.length.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " edits"}</span>
+                      </div>
+                    )
+                  })}
+                </StackGrid>
               </div>
-            ) : 
-              this.state.data.map((board, key) => {
-                const redirPath = "/" + board._id
-                return(
-                  <span key={key} >
-                    <Link style={{color:"#707070", textAlign: "center", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
-                    <br/>
-                    <img src={this.getBoardPng(board.boardData)} alt={"popular-" + this.state.newBoardName} style={{"border":"1px solid #FFF"}}/>
-                    <br/>
-                  </span>
-                )
-              })
             }
           </div>
 
           {/* RIGHT SECTION */}
           <div id="right">
-            <h3>Recent Boards</h3>
+            <h3 style={{fontSize: "1.5em"}}>Recent Boards</h3>
             {!this.state.data ? (
-              <div className="centered">
-                <RingLoader
-                  sizeUnit={"px"}
-                  size={25}
-                  color={'#36D8B7'}
-                />
+              <RingLoader
+                css={override}
+                sizeUnit={"px"}
+                size={40}
+                color={'#FFF'}
+              />
+            ) :
+              <div style={{height: '500px', overflowX: "hidden"}}>
+                <StackGrid columnWidth={250}>
+                  {this.state.data.sort((a, b) => {return moment(b.dateCreated) - moment(a.dateCreated)}).slice(0,21).map((board, key) => {
+                    var redirPath = "/" + board._id
+                    var timeElapsed = moment(board.dateCreated).from(moment());
+                    return(
+                      <div
+                        style={{
+                          width: 250,
+                          height: 175,
+                        }}
+                        key={key}
+                      >
+                        <Link to={redirPath}>
+                          <Image
+                            src={this.getBoardPng(board.boardData)}
+                            alt={"recent-" + board.name}
+                            style={{"border":"1px solid #767676"}}
+                          />
+                        </Link>
+                        <b>{board.name}</b><br/>
+                        <span style={{color: "#666666"}}>{"Created " + timeElapsed}</span>
+                        <br/>
+                      </div>
+                    )
+                  })}
+                </StackGrid>
               </div>
-            ) : 
-              this.state.data.map((board, key) => {
-                const redirPath = "/" + board._id
-                return(
-                  <span key={key} >
-                    <Link style={{color:"#707070", textAlign: "center", fontSize: "16px"}} to={redirPath}>{board.name}</Link>
-                    <br/>
-                  </span>
-                )
-              })
             }
           </div>
         </div>

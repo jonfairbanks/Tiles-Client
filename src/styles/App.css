@@ -17,7 +17,9 @@
 
 .App-title {
   font-family: 'VT323', monospace;
-  font-size: 2.5em;
+  font-weight: 100;
+  font-size: 2.25em;
+  letter-spacing: "5px";
 }
 
 .App-intro {
@@ -59,10 +61,10 @@ body {
 }
 
 .centered {
-  position: absolute;
-  left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
 }
 
 .centered-vh {
@@ -71,4 +73,8 @@ body {
   top: 50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
