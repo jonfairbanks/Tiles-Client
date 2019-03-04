@@ -14,6 +14,32 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'react-chat-widget/lib/styles.css';
 
 const socketUrl = "https://" + process.env.REACT_APP_API;
+  // Constructor for Shape objects to hold data for all drawn objects.
+// For now they will just be defined as rectangles.
+function Shape(x, y, w, h, fill) {
+  // This is a very simple and unsafe constructor. 
+  // All we're doing is checking if the values exist.
+  // "x || 0" just means "if there is a value for x, use that. Otherwise use 0."
+  this.x = x || 0;
+  this.y = y || 0;
+  this.w = w || 1;
+  this.h = h || 1;
+  this.fill = fill || '#AAAAAA';
+}
+
+// Draws this shape to a given context
+Shape.prototype.draw = function(ctx) {
+  ctx.fillStyle = this.fill;
+  ctx.fillRect(this.x, this.y, this.w, this.h);
+}
+
+// Determine if a point is inside the shape's bounds
+Shape.prototype.contains = function(mx, my) {
+  // All we have to do is make sure the Mouse X,Y fall in the area between
+  // the shape's X and (X + Width) and its Y and (Y + Height)
+  return  (this.x <= mx) && (this.x + this.w >= mx) &&
+          (this.y <= my) && (this.y + this.h >= my);
+}
 
 class Board extends Component {
   constructor(props) {
@@ -24,10 +50,13 @@ class Board extends Component {
       socket: null,
       boardLog: false,
       userCount: 1,
-      visible: false
+      visible: false,
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight
     };
     this.draggingPopup = false;
     this.pendingChanges= []
+    this.scale = 7;
   }
 
   handleHideClick = () => this.setState({ visible: false })
@@ -47,7 +76,12 @@ class Board extends Component {
       })
   }
 
-  changeTileColor(x,y,e) {
+  changeTileColor(e) {
+    var scale = this.scale
+
+    var x = Math.ceil(e.clientY / scale) - 1
+    var y = Math.ceil(e.clientX / scale) - 1
+
     if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
@@ -58,17 +92,20 @@ class Board extends Component {
       if (desiredState.tiles[x][y] === color){
         desiredState.tiles[x][y] = desiredState.baseColor;
         tileUpdateData.color = desiredState.baseColor
-        e.target.setAttribute("bgColor", desiredState.baseColor);
         this.pendingChanges.push(tileUpdateData);
       } else {
         desiredState.tiles[x][y] = color;
-        e.target.setAttribute("bgColor", color);
         this.pendingChanges.push(tileUpdateData);
       }
     } else {}
   }
 
-  changeTileColorMouseMove(x,y,e) {
+  changeTileColorMouseMove(e) {
+    const ctx = this.refs.canvas.getContext('2d');
+    var scale = this.scale;
+
+    var x = Math.ceil(e.clientY / scale) - 1
+    var y = Math.ceil(e.clientX / scale) - 1
     if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
@@ -76,6 +113,9 @@ class Board extends Component {
       tileUpdateData.x = x
       tileUpdateData.y = y
       tileUpdateData.color = color
+
+      var pixel = new Shape(y * this.scale,x * scale,scale,scale, color)
+      pixel.draw(ctx)
 
       this.pendingChanges.push(tileUpdateData);
       e.target.setAttribute("bgColor", color);
@@ -200,13 +240,25 @@ class Board extends Component {
         pom.click();
     }
   }
-
+  
   componentDidMount() {
+    window.addEventListener('resize', this.updateWindowDimensions());
     addResponseMessage("Welcome to Tiles!");
     // DEFINE SOCKET EVENT LISTENERS
     const { socket} = this.state;
     socket.on("setBoardState", receivedState => {
+      
       this.setState({boardState: receivedState,userCount:receivedState.connections});
+      this.updateCanvas()
+    })
+
+    socket.on("updateTiles", tileUpdateData => {
+      var desiredState = {...this.state.boardState}
+      for (var i = 0; i < tileUpdateData.length; i++ ){
+        desiredState.tiles[tileUpdateData[i].x][tileUpdateData[i].y] = tileUpdateData[i].color 
+      }
+      this.setState({boardState: desiredState});
+      this.updateCanvas()
     })
 
     const Msg1 = ({ closeToast }) => (
@@ -247,12 +299,39 @@ class Board extends Component {
         pauseOnVisibilityChange: false,
       });
     }, 11000);
-	}
+
+    
+  }
+
+  updateWindowDimensions() {
+    this.setState({ innerWidth: window.innerWidth, innerHeight: window.innerHeight });
+
+  }
+
+  updateCanvas() {
+
+    const ctx = this.refs.canvas.getContext('2d');
+    var canvasData = this.state.boardState.tiles
+    var scale = this.scale;
+
+    ctx.canvas.width  = this.state.innerWidth;
+    ctx.canvas.height = this.state.innerHeight;
+
+    for(var y = 0; y < canvasData.length; y++){
+      for(var x = 0; x < canvasData[0].length; x++){
+        var pixel = new Shape(x * this.scale,y * scale,scale,scale, canvasData[y][x])
+        pixel.draw(ctx)
+      }
+    }
+  }
 
   render() {
     const { boardState, visible } = this.state;
     return (
+
+      
       boardState ? 
+      
       <Sidebar.Pushable as={Segment} style={{"border":"none","borderRadius":0}}>
 
         {/* LEFT SIDEBAR */}
@@ -317,17 +396,7 @@ class Board extends Component {
                   pauseOnHover
                 />
                 <ToastContainer />
-                <table className="center">
-                  <tbody>
-                    {boardState.tiles.map((row, i) =>
-                      <tr key={i}>
-                        {row.map((col, j) =>
-                          <td key={j} onMouseMove={(e)=>{ this.changeTileColorMouseMove(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j,e) }} onMouseUp={(e)=>{this.handleMouseUp(e)}} onContextMenu={(e)=>{this.onContextMenu(e)}}bgcolor={col}></td>
-                        )}
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                <canvas ref="canvas" onMouseUp={(e)=>{this.handleMouseUp(e)}} onMouseDown={(e)=>{ this.changeTileColor(e) }} onMouseMove={(e)=>{ this.changeTileColorMouseMove(e) }} onContextMenu={(e)=>{this.onContextMenu(e)}}/>
               </div>
           </Segment>
         </Sidebar.Pusher>
@@ -339,7 +408,11 @@ class Board extends Component {
         size={125}
         color={'#36D8B7'}
       />
-    </div>);
+    </div>
+      
+      
+      
+      );
   }
 }
 export default Board;
