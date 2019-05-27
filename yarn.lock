@@ -1852,10 +1852,10 @@ backo2@1.0.2:
   resolved "https://registry.yarnpkg.com/backo2/-/backo2-1.0.2.tgz#31ab1ac8b129363463e35b3ebb69f4dfcfba7947"
   integrity sha1-MasayLEpNjRj41s+u2n038+6eUc=
 
-bad-words@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/bad-words/-/bad-words-3.0.1.tgz#f24070f4200c8ce58084c31c9f6e442168199990"
-  integrity sha512-rWtqDJdwJDmht6pCYOAu/reX/F94rIG22Jnx8btKGQ1s/iMAYTcK1rjC8fyhSKDiftAeSqz3xqqfA3H5Yn1dnw==
+bad-words@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/bad-words/-/bad-words-3.0.2.tgz#866de8f4be545eaea073a1e47d9ff67d3bb402ee"
+  integrity sha512-FwZAyyBOzCbt2Zw6R6vjZgoK2BDVTg0XjsobRkkNlKc/jIHW49j3Kjwtwyb2hxQBZor2aQaQ/NGzf6s7888wlQ==
   dependencies:
     badwords-list "^1.0.0"
 
