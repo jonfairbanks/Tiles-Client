@@ -177,14 +177,17 @@ class Board extends Component {
 		const socket = io(socketUrl)
 		socket.on('connect', ()=>{
       socket.emit("joinChannel", this.props.match.params.boardId);
+      console.log('socket connected')
     })
 
     socket.on('updateConnections', newConnectionCount => {
       this.setState({userCount: newConnectionCount})
+      console.log('connection count changed')
     })
     
     socket.on("disconnect", () => {
       this.initSocket()
+      console.log('disconnected')
     });
 		this.setState({socket})
   }
@@ -250,6 +253,8 @@ class Board extends Component {
       
       this.setState({boardState: receivedState,userCount:receivedState.connections});
       this.updateCanvas()
+      console.log('received initial board state')
+      console.log(this.state.boardState.apiHost)
     })
 
     socket.on("updateTiles", tileUpdateData => {
@@ -259,6 +264,7 @@ class Board extends Component {
       }
       this.setState({boardState: desiredState});
       this.updateCanvas()
+      console.log('received board update')
     })
 
     const Msg1 = ({ closeToast }) => (
