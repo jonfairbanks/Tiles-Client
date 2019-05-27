@@ -4,7 +4,7 @@
   "private": false,
   "license": "MIT",
   "dependencies": {
-    "@emotion/core": "^10.0.7",
+    "@emotion/core": "^10.0.10",
     "axios": "^0.18.0",
     "bad-words": "^3.0.1",
     "moment": "^2.24.0",
