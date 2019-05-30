@@ -174,7 +174,15 @@ class Board extends Component {
   }
 
   initSocket = ()=>{
-		const socket = io(socketUrl)
+		const socket = io(socketUrl,{ // [1] Important as fuck 
+      reconnectionDelay: 1000,
+      reconnection:true,
+      reconnectionAttempts: 10,
+      transports: ['websocket'],
+      agent: false, // [2] Please don't set this to true
+      upgrade: false,
+      rejectUnauthorized: false
+   })
 		socket.on('connect', ()=>{
       socket.emit("joinChannel", this.props.match.params.boardId);
       console.log('socket connected')
