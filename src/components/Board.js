@@ -1,19 +1,49 @@
 import React, { Component } from "react";
-import { CompactPicker } from 'react-color';
+import { CirclePicker } from 'react-color';
 import io from "socket.io-client";
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
 import { RingLoader } from 'react-spinners';
-import { Icon, Menu, Segment, Sidebar } from 'semantic-ui-react';
-import { Widget, addResponseMessage } from 'react-chat-widget';
+import { Icon, Segment, Input, Form, Divider, Header, Label} from 'semantic-ui-react';
 import PNGImage from 'pnglib-es6';
+import Draggable from 'react-draggable';
+import Chance from 'chance';
 
 import '../styles/Board.css';
 import '../styles/Chat.css';
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-chat-widget/lib/styles.css';
 
+const nameGetter = new Chance();
+const getAName = () => nameGetter.first();
+
 const socketUrl = "https://" + process.env.REACT_APP_API;
+  // Constructor for Shape objects to hold data for all drawn objects.
+// For now they will just be defined as rectangles.
+function Shape(x, y, w, h, fill) {
+  // This is a very simple and unsafe constructor. 
+  // All we're doing is checking if the values exist.
+  // "x || 0" just means "if there is a value for x, use that. Otherwise use 0."
+  this.x = x || 0;
+  this.y = y || 0;
+  this.w = w || 1;
+  this.h = h || 1;
+  this.fill = fill || '#AAAAAA';
+}
+
+// Draws this shape to a given context
+Shape.prototype.draw = function(ctx) {
+  ctx.fillStyle = this.fill;
+  ctx.fillRect(this.x, this.y, this.w, this.h);
+}
+
+// Determine if a point is inside the shape's bounds
+Shape.prototype.contains = function(mx, my) {
+  // All we have to do is make sure the Mouse X,Y fall in the area between
+  // the shape's X and (X + Width) and its Y and (Y + Height)
+  return  (this.x <= mx) && (this.x + this.w >= mx) &&
+          (this.y <= my) && (this.y + this.h >= my);
+}
 
 class Board extends Component {
   constructor(props) {
@@ -24,10 +54,17 @@ class Board extends Component {
       socket: null,
       boardLog: false,
       userCount: 1,
-      visible: false
+      visible: false,
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
+      messages: [],
+      message: "",
+      username: getAName()
     };
+
     this.draggingPopup = false;
     this.pendingChanges= []
+    this.scale = 7;
   }
 
   handleHideClick = () => this.setState({ visible: false })
@@ -47,7 +84,12 @@ class Board extends Component {
       })
   }
 
-  changeTileColor(x,y,e) {
+  changeTileColor(e) {
+    var scale = this.scale
+
+    var x = Math.ceil(e.clientY / scale) - 1
+    var y = Math.ceil(e.clientX / scale) - 1
+
     if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
@@ -58,17 +100,20 @@ class Board extends Component {
       if (desiredState.tiles[x][y] === color){
         desiredState.tiles[x][y] = desiredState.baseColor;
         tileUpdateData.color = desiredState.baseColor
-        e.target.setAttribute("bgColor", desiredState.baseColor);
         this.pendingChanges.push(tileUpdateData);
       } else {
         desiredState.tiles[x][y] = color;
-        e.target.setAttribute("bgColor", color);
         this.pendingChanges.push(tileUpdateData);
       }
     } else {}
   }
 
-  changeTileColorMouseMove(x,y,e) {
+  changeTileColorMouseMove(e) {
+    const ctx = this.refs.canvas.getContext('2d');
+    var scale = this.scale;
+
+    var x = Math.ceil(e.clientY / scale) - 1
+    var y = Math.ceil(e.clientX / scale) - 1
     if((e.buttons === 1 || e.buttons === 3) && this.draggingPopup === false){
       var desiredState = {...this.state.boardState}
       var {color} = this.state;
@@ -76,6 +121,9 @@ class Board extends Component {
       tileUpdateData.x = x
       tileUpdateData.y = y
       tileUpdateData.color = color
+
+      var pixel = new Shape(y * this.scale,x * scale,scale,scale, color)
+      pixel.draw(ctx)
 
       this.pendingChanges.push(tileUpdateData);
       e.target.setAttribute("bgColor", color);
@@ -96,17 +144,20 @@ class Board extends Component {
 
   handleColorPicker = (color) => {
     this.setState({ color: color.hex});
-    this.handleHideClick();
+
+    //this.handleHideClick();
   };
 
   onContextMenu = (e) => {
     if(this.state.visible === false) {
       this.handleShowClick();
+
       e.preventDefault();
     }
     
     if(this.state.visible === true) {
       this.handleHideClick();
+
       e.preventDefault();
     }
   }
@@ -123,30 +174,85 @@ class Board extends Component {
     return uniques;
   }
 
-  handleNewUserMessage = (newMessage) => {
-    console.log(`New message incoming! ${newMessage}`);
-    // Now send the message throught the backend API
-    addResponseMessage(newMessage);
-  }
+
 
   componentWillMount() {
+    
 		this.initSocket()
   }
 
   initSocket = ()=>{
-		const socket = io(socketUrl)
+		const socket = io(socketUrl,{ // [1] Important as fuck 
+      reconnectionDelay: 1000,
+      reconnection:true,
+      reconnectionAttempts: 10,
+      transports: ['websocket'],
+      agent: false, // [2] Please don't set this to true
+      upgrade: false,
+      rejectUnauthorized: false
+   })
 		socket.on('connect', ()=>{
-      socket.emit("joinChannel", this.props.match.params.boardId);
+      
+      socket.emit("joinChannel", this.props.match.params.boardId, this.state.username);
+      console.log('socket connected')
     })
 
-    socket.on('updateConnections', newConnectionCount => {
-      this.setState({userCount: newConnectionCount})
+    socket.on('userJoined', (username) => {
+      console.log(username + ' joined the room')
+
+      const UserJoinToast = ({ closeToast }) => (
+        <div style={{margin: "10px 10px 10px 10px"}}>
+          <Icon inverted style={{float: "left", marginRight: "25px", color: "#36D8B7"}} name='add user' size='large' />
+          <span><b>{username} joined the room</b></span>
+        </div>
+      )
+
+      toast(<UserJoinToast />, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        pauseOnVisibilityChange: false,
+        className: 'toast1',
+        bodyClassName: "toast1-body",
+        progressClassName: 'toast1-progress'
+      });
+
+    })
+
+    socket.on('userLeft', (username) => {
+      console.log(username + ' left the room')
+
+      const UserJoinToast = ({ closeToast }) => (
+        <div style={{margin: "10px 10px 10px 10px"}}>
+          <Icon inverted style={{float: "left", marginRight: "25px", color: "#36D8B7"}} name='remove user' size='large' />
+          <span><b>{username} left the room</b></span>
+        </div>
+      )
+
+      toast(<UserJoinToast />, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        pauseOnVisibilityChange: false,
+        className: 'toast1',
+        bodyClassName: "toast1-body",
+        progressClassName: 'toast1-progress'
+      });
+
     })
     
     socket.on("disconnect", () => {
+      socket.disconnect()
       this.initSocket()
+      console.log('disconnected')
     });
-		this.setState({socket})
+    this.setState({socket})
   }
 
   componentWillUnmount(){
@@ -200,13 +306,32 @@ class Board extends Component {
         pom.click();
     }
   }
-
+  
   componentDidMount() {
-    addResponseMessage("Welcome to Tiles!");
+
+    window.addEventListener('resize', this.updateWindowDimensions());
     // DEFINE SOCKET EVENT LISTENERS
     const { socket} = this.state;
     socket.on("setBoardState", receivedState => {
-      this.setState({boardState: receivedState,userCount:receivedState.connections});
+      
+      this.setState({boardState: receivedState,userCount:receivedState.connections, messages: receivedState.messages ? receivedState.messages : [] });
+      this.updateCanvas()
+      console.log('received initial board state')
+      console.log(this.state.boardState.apiHost)
+    })
+
+    socket.on("updateTiles", tileUpdateData => {
+      var desiredState = {...this.state.boardState}
+      for (var i = 0; i < tileUpdateData.length; i++ ){
+        desiredState.tiles[tileUpdateData[i].x][tileUpdateData[i].y] = tileUpdateData[i].color 
+      }
+      this.setState({boardState: desiredState});
+      this.updateCanvas()
+      console.log('received board update')
+    })
+
+    socket.on("message", message => {
+      this.setState({messages: [...this.state.messages, message]});
     })
 
     const Msg1 = ({ closeToast }) => (
@@ -247,91 +372,92 @@ class Board extends Component {
         pauseOnVisibilityChange: false,
       });
     }, 11000);
-	}
+
+    
+  }
+
+  updateWindowDimensions() {
+    this.setState({ innerWidth: window.innerWidth, innerHeight: window.innerHeight });
+
+  }
+
+  updateCanvas() {
+
+    const ctx = this.refs.canvas.getContext('2d');
+    var canvasData = this.state.boardState.tiles
+    var scale = this.scale;
+
+    ctx.canvas.width  = this.state.innerWidth;
+    ctx.canvas.height = this.state.innerHeight;
+
+    for(var y = 0; y < canvasData.length; y++){
+      for(var x = 0; x < canvasData[0].length; x++){
+        var pixel = new Shape(x * this.scale,y * scale,scale,scale, canvasData[y][x])
+        pixel.draw(ctx)
+      }
+    }
+  }
+
+  
 
   render() {
-    const { boardState, visible } = this.state;
+    const { boardState, visible, messages, socket} = this.state;
     return (
+
+      
       boardState ? 
-      <Sidebar.Pushable as={Segment} style={{"border":"none","borderRadius":0}}>
 
-        {/* LEFT SIDEBAR */}
-        <Sidebar
-          as={Menu}
-          animation='push'
-          direction='bottom'
-          icon='labeled'
-          inverted
-          visible={visible}
-          width='wide'
-        >
-          <Menu.Item as="a" href='/'>
-            <h1 style={{color: "#36D8B7"}} className="App-title">TILES</h1>
-          </Menu.Item>
-          <Menu.Item as='a'>
-            <Icon inverted style={{color: "#36D8B7"}} name='wrench' size='tiny' />
-            Tools
-          </Menu.Item>
-          <Menu.Item as='a'>
-            <Icon inverted style={{color: "#36D8B7"}} name='share' size='tiny' />
-            Share
-          </Menu.Item>
-          <Menu.Item as='a'>
-            <Icon inverted style={{color: "#36D8B7"}} name='users' size='tiny' />
-            {this.state.userCount > 1
-              ? this.state.userCount + " Users"
-              : this.state.userCount + " User"
-            }
-          </Menu.Item>
+      <div>
+        
+        <Segment basic inverted style={{padding:'0', margin: '0'}}>
+            <div style={{"textAlign":"left", margin: '0', padding: '0'}}>
+              <ToastContainer
+                position="top-right"
+                autoClose={10000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnVisibilityChange={false}
+                draggable
+                pauseOnHover
+              />
+              <canvas style={{display:'block'}} ref="canvas" onMouseUp={(e)=>{this.handleMouseUp(e)}} onMouseDown={(e)=>{ this.changeTileColor(e) }} onMouseMove={(e)=>{ this.changeTileColorMouseMove(e) }} onContextMenu={(e)=>{this.onContextMenu(e)}}/>
+            </div>
+            
+        </Segment>
+        {visible ? 
+          <Draggable handle=".handle">
+            <div style={{position:'absolute', backgroundColor: '#FFF', top: '100px', left: '100px', padding: '1em',maxWidth:'265px', borderRadius: '5px'}} >
+              <Header dividing as='h3' className='handle'>Tiles</Header>
+              <CirclePicker styles={{boxShadow: '0 0 0 0px rgba(0,0,0,0)'}}
+                color={ this.state.color }
+                onChangeComplete={ this.handleColorPicker }
+              />
 
-          <Menu.Item onClick={(e)=>this.download("download.png", this.getBoardPng(boardState.tiles,5))}>
-            <Icon inverted style={{color: "#36D8B7"}} name='save' size='tiny' />
-            Save Image
-          </Menu.Item>
-
-          <div style={{margin: "12px 0"}}>
-            <CompactPicker
-              color={ this.state.color }
-              onChangeComplete={ this.handleColorPicker }
-            />
-          </div>
-          <Widget
-            handleNewUserMessage={this.handleNewUserMessage}
-            profileAvatar="https://picsum.photos/100/100/?random"
-          />
-        </Sidebar>
-
-        {/* MAIN CONTENT */}
-        <Sidebar.Pusher>
-          <Segment basic inverted style={{"padding":"0 0 0 0"}}>
-              <div style={{"textAlign":"left"}}>
-                <ToastContainer
-                  position="top-right"
-                  autoClose={10000}
-                  hideProgressBar={false}
-                  newestOnTop={false}
-                  closeOnClick
-                  rtl={false}
-                  pauseOnVisibilityChange={false}
-                  draggable
-                  pauseOnHover
-                />
-                <ToastContainer />
-                <table className="center">
-                  <tbody>
-                    {boardState.tiles.map((row, i) =>
-                      <tr key={i}>
-                        {row.map((col, j) =>
-                          <td key={j} onMouseMove={(e)=>{ this.changeTileColorMouseMove(i,j,e) }} onMouseDown={(e)=>{ this.changeTileColor(i,j,e) }} onMouseUp={(e)=>{this.handleMouseUp(e)}} onContextMenu={(e)=>{this.onContextMenu(e)}}bgcolor={col}></td>
-                        )}
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+              <div style={{background:'white', textAlign:'left', marginTop:'15px'}}>
+                <Messages socket={socket} messages={messages} boardId={this.props.match.params.boardId} username={this.state.username}/>
               </div>
-          </Segment>
-        </Sidebar.Pusher>
-      </Sidebar.Pushable>
+              <Divider inverted />
+              <Label as='a'>
+                <Icon name='share' />
+                Share
+              </Label>
+              <Label as='a' onClick={(e)=>this.download("download.png", this.getBoardPng(boardState.tiles,5))}>
+                <Icon name='save' />
+                Save
+              </Label>
+              <Label as='a'>
+                <Icon name='flag' />
+                Report
+              </Label>
+
+            </div>
+          </Draggable>
+        :null
+        }
+      </div>
+
     :
     <div className="centered-vh">
       <RingLoader
@@ -339,7 +465,105 @@ class Board extends Component {
         size={125}
         color={'#36D8B7'}
       />
-    </div>);
+    </div>
+      
+      
+      
+      );
   }
 }
+
+class Messages extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      messages: [],
+      message: ""
+    };
+  }
+
+  messagesEndRef = React.createRef()
+
+  componentDidMount () {
+    this.InitToBottom()
+    this.nameInput.focus();
+  }
+
+  componentDidUpdate () {
+    this.scrollToBottom()
+  }
+
+  scrollToBottom = () => {
+    this.messagesEndRef.current.scrollIntoView({behavior: "smooth", block: "start"})
+  }
+
+  InitToBottom = () => {
+    this.messagesEndRef.current.scrollIntoView()
+  }
+
+  handleMessageChange(e) {
+    this.setState({
+        message: e.target.value
+    })
+  }
+
+  handleMessageSubmit(e) {
+    e.preventDefault();
+    this.submitMessage()
+    this.setState({
+        message: ''
+    })
+  }
+
+  submitMessage(){
+    const message = {}
+    message.username = this.props.username
+    message.text = this.state.message
+    if(message.text !== ''){
+      this.props.socket.emit("message", this.props.boardId, message)
+      this.setState({messages:[...this.state.messages, message]})
+    }
+    
+  }
+
+  render () {
+    const { messages } = this.props
+    const {message} = this.state
+
+    return (
+      <div>
+        <div style={{ maxHeight: '175px', overflowX:'hidden', overflowY:'scroll'}}>
+          
+          {messages.map((message, key) => 
+            
+            <div key={key}>
+              {message.username === this.props.username ?
+                <span key={key} style={{display: 'block', float:'right', clear: 'both', marginTop:'.5em'}}>
+                  
+                  <span style={{backgroundColor:'#36d8b7',padding: '5px', borderRadius: '5px', color: 'white', float:'right',display:'block', clear:'both'}}>{message.text}</span>
+                </span>
+              :
+              <span key={key} style={{display: 'block',marginTop:'.5em', clear: 'both'}}>
+                  <span style={{fontSize:'10px', paddingLeft:'5px', margin:'0',display:'block', color: 'gray', lineHeight:'10px'}}>{message.username}</span>
+                  <span style={{backgroundColor:'#DDD',display:'block',padding: '5px', borderRadius: '5px', color: 'black'}}>{message.text}</span>
+                </span>
+              }
+            </div>
+          )}
+          <div ref={this.messagesEndRef}/>
+        </div>
+
+        <Form onSubmit={(e)=>this.handleMessageSubmit(e)} style={{marginTop:'10px'}}>
+          
+          <Input ref={(input) => { this.nameInput = input; }} icon='angle right' placeholder='Send message..'onChange={(e)=>this.handleMessageChange(e)} value={message} style={{display:'flex'}}/>
+        </Form>
+      </div>
+    )
+  }
+}
+
+
 export default Board;
+
+
