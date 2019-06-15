@@ -1,17 +1,21 @@
 import React, { Component } from "react";
-import { CompactPicker } from 'react-color';
+import { CirclePicker } from 'react-color';
 import io from "socket.io-client";
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
 import { RingLoader } from 'react-spinners';
-import { Icon, Menu, Segment, Sidebar } from 'semantic-ui-react';
-import { Widget, addResponseMessage } from 'react-chat-widget';
+import { Icon, Segment, Input, Form, Divider, Header, Label} from 'semantic-ui-react';
 import PNGImage from 'pnglib-es6';
+import Draggable from 'react-draggable';
+import Chance from 'chance';
 
 import '../styles/Board.css';
 import '../styles/Chat.css';
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-chat-widget/lib/styles.css';
+
+const nameGetter = new Chance();
+const getAName = () => nameGetter.first();
 
 const socketUrl = "https://" + process.env.REACT_APP_API;
   // Constructor for Shape objects to hold data for all drawn objects.
@@ -52,8 +56,12 @@ class Board extends Component {
       userCount: 1,
       visible: false,
       innerWidth: window.innerWidth,
-      innerHeight: window.innerHeight
+      innerHeight: window.innerHeight,
+      messages: [],
+      message: "",
+      username: getAName()
     };
+
     this.draggingPopup = false;
     this.pendingChanges= []
     this.scale = 7;
@@ -136,17 +144,20 @@ class Board extends Component {
 
   handleColorPicker = (color) => {
     this.setState({ color: color.hex});
-    this.handleHideClick();
+
+    //this.handleHideClick();
   };
 
   onContextMenu = (e) => {
     if(this.state.visible === false) {
       this.handleShowClick();
+
       e.preventDefault();
     }
     
     if(this.state.visible === true) {
       this.handleHideClick();
+
       e.preventDefault();
     }
   }
@@ -163,13 +174,10 @@ class Board extends Component {
     return uniques;
   }
 
-  handleNewUserMessage = (newMessage) => {
-    console.log(`New message incoming! ${newMessage}`);
-    // Now send the message throught the backend API
-    addResponseMessage(newMessage);
-  }
+
 
   componentWillMount() {
+    
 		this.initSocket()
   }
 
@@ -184,20 +192,67 @@ class Board extends Component {
       rejectUnauthorized: false
    })
 		socket.on('connect', ()=>{
-      socket.emit("joinChannel", this.props.match.params.boardId);
+      
+      socket.emit("joinChannel", this.props.match.params.boardId, this.state.username);
       console.log('socket connected')
     })
 
-    socket.on('updateConnections', newConnectionCount => {
-      this.setState({userCount: newConnectionCount})
-      console.log('connection count changed')
+    socket.on('userJoined', (username) => {
+      console.log(username + ' joined the room')
+
+      const UserJoinToast = ({ closeToast }) => (
+        <div style={{margin: "10px 10px 10px 10px"}}>
+          <Icon inverted style={{float: "left", marginRight: "25px", color: "#36D8B7"}} name='add user' size='large' />
+          <span><b>{username} joined the room</b></span>
+        </div>
+      )
+
+      toast(<UserJoinToast />, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        pauseOnVisibilityChange: false,
+        className: 'toast1',
+        bodyClassName: "toast1-body",
+        progressClassName: 'toast1-progress'
+      });
+
+    })
+
+    socket.on('userLeft', (username) => {
+      console.log(username + ' left the room')
+
+      const UserJoinToast = ({ closeToast }) => (
+        <div style={{margin: "10px 10px 10px 10px"}}>
+          <Icon inverted style={{float: "left", marginRight: "25px", color: "#36D8B7"}} name='remove user' size='large' />
+          <span><b>{username} left the room</b></span>
+        </div>
+      )
+
+      toast(<UserJoinToast />, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        pauseOnVisibilityChange: false,
+        className: 'toast1',
+        bodyClassName: "toast1-body",
+        progressClassName: 'toast1-progress'
+      });
+
     })
     
     socket.on("disconnect", () => {
+      socket.disconnect()
       this.initSocket()
       console.log('disconnected')
     });
-		this.setState({socket})
+    this.setState({socket})
   }
 
   componentWillUnmount(){
@@ -253,13 +308,13 @@ class Board extends Component {
   }
   
   componentDidMount() {
+
     window.addEventListener('resize', this.updateWindowDimensions());
-    addResponseMessage("Welcome to Tiles!");
     // DEFINE SOCKET EVENT LISTENERS
     const { socket} = this.state;
     socket.on("setBoardState", receivedState => {
       
-      this.setState({boardState: receivedState,userCount:receivedState.connections});
+      this.setState({boardState: receivedState,userCount:receivedState.connections, messages: receivedState.messages ? receivedState.messages : [] });
       this.updateCanvas()
       console.log('received initial board state')
       console.log(this.state.boardState.apiHost)
@@ -273,6 +328,10 @@ class Board extends Component {
       this.setState({boardState: desiredState});
       this.updateCanvas()
       console.log('received board update')
+    })
+
+    socket.on("message", message => {
+      this.setState({messages: [...this.state.messages, message]});
     })
 
     const Msg1 = ({ closeToast }) => (
@@ -339,82 +398,66 @@ class Board extends Component {
     }
   }
 
+  
+
   render() {
-    const { boardState, visible } = this.state;
+    const { boardState, visible, messages, socket} = this.state;
     return (
 
       
       boardState ? 
-      
-      <Sidebar.Pushable as={Segment} style={{"border":"none","borderRadius":0}}>
 
-        {/* LEFT SIDEBAR */}
-        <Sidebar
-          as={Menu}
-          animation='push'
-          direction='bottom'
-          icon='labeled'
-          inverted
-          visible={visible}
-          width='wide'
-        >
-          <Menu.Item as="a" href='/'>
-            <h1 style={{color: "#36D8B7"}} className="App-title">TILES</h1>
-          </Menu.Item>
-          <Menu.Item as='a'>
-            <Icon inverted style={{color: "#36D8B7"}} name='wrench' size='tiny' />
-            Tools
-          </Menu.Item>
-          <Menu.Item as='a'>
-            <Icon inverted style={{color: "#36D8B7"}} name='share' size='tiny' />
-            Share
-          </Menu.Item>
-          <Menu.Item as='a'>
-            <Icon inverted style={{color: "#36D8B7"}} name='users' size='tiny' />
-            {this.state.userCount > 1
-              ? this.state.userCount + " Users"
-              : this.state.userCount + " User"
-            }
-          </Menu.Item>
+      <div>
+        
+        <Segment basic inverted style={{padding:'0', margin: '0'}}>
+            <div style={{"textAlign":"left", margin: '0', padding: '0'}}>
+              <ToastContainer
+                position="top-right"
+                autoClose={10000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnVisibilityChange={false}
+                draggable
+                pauseOnHover
+              />
+              <canvas style={{display:'block'}} ref="canvas" onMouseUp={(e)=>{this.handleMouseUp(e)}} onMouseDown={(e)=>{ this.changeTileColor(e) }} onMouseMove={(e)=>{ this.changeTileColorMouseMove(e) }} onContextMenu={(e)=>{this.onContextMenu(e)}}/>
+            </div>
+            
+        </Segment>
+        {visible ? 
+          <Draggable handle=".handle">
+            <div style={{position:'absolute', backgroundColor: '#FFF', top: '100px', left: '100px', padding: '1em',maxWidth:'265px', borderRadius: '5px'}} >
+              <Header dividing as='h3' className='handle'>Tiles</Header>
+              <CirclePicker styles={{boxShadow: '0 0 0 0px rgba(0,0,0,0)'}}
+                color={ this.state.color }
+                onChangeComplete={ this.handleColorPicker }
+              />
 
-          <Menu.Item onClick={(e)=>this.download("download.png", this.getBoardPng(boardState.tiles,5))}>
-            <Icon inverted style={{color: "#36D8B7"}} name='save' size='tiny' />
-            Save Image
-          </Menu.Item>
-
-          <div style={{margin: "12px 0"}}>
-            <CompactPicker
-              color={ this.state.color }
-              onChangeComplete={ this.handleColorPicker }
-            />
-          </div>
-          <Widget
-            handleNewUserMessage={this.handleNewUserMessage}
-            profileAvatar="https://picsum.photos/100/100/?random"
-          />
-        </Sidebar>
-
-        {/* MAIN CONTENT */}
-        <Sidebar.Pusher>
-          <Segment basic inverted style={{"padding":"0 0 0 0"}}>
-              <div style={{"textAlign":"left"}}>
-                <ToastContainer
-                  position="top-right"
-                  autoClose={10000}
-                  hideProgressBar={false}
-                  newestOnTop={false}
-                  closeOnClick
-                  rtl={false}
-                  pauseOnVisibilityChange={false}
-                  draggable
-                  pauseOnHover
-                />
-                <ToastContainer />
-                <canvas ref="canvas" onMouseUp={(e)=>{this.handleMouseUp(e)}} onMouseDown={(e)=>{ this.changeTileColor(e) }} onMouseMove={(e)=>{ this.changeTileColorMouseMove(e) }} onContextMenu={(e)=>{this.onContextMenu(e)}}/>
+              <div style={{background:'white', textAlign:'left', marginTop:'15px'}}>
+                <Messages socket={socket} messages={messages} boardId={this.props.match.params.boardId} username={this.state.username}/>
               </div>
-          </Segment>
-        </Sidebar.Pusher>
-      </Sidebar.Pushable>
+              <Divider inverted />
+              <Label as='a'>
+                <Icon name='share' />
+                Share
+              </Label>
+              <Label as='a' onClick={(e)=>this.download("download.png", this.getBoardPng(boardState.tiles,5))}>
+                <Icon name='save' />
+                Save
+              </Label>
+              <Label as='a'>
+                <Icon name='flag' />
+                Report
+              </Label>
+
+            </div>
+          </Draggable>
+        :null
+        }
+      </div>
+
     :
     <div className="centered-vh">
       <RingLoader
@@ -429,4 +472,98 @@ class Board extends Component {
       );
   }
 }
+
+class Messages extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      messages: [],
+      message: ""
+    };
+  }
+
+  messagesEndRef = React.createRef()
+
+  componentDidMount () {
+    this.InitToBottom()
+    this.nameInput.focus();
+  }
+
+  componentDidUpdate () {
+    this.scrollToBottom()
+  }
+
+  scrollToBottom = () => {
+    this.messagesEndRef.current.scrollIntoView({behavior: "smooth", block: "start"})
+  }
+
+  InitToBottom = () => {
+    this.messagesEndRef.current.scrollIntoView()
+  }
+
+  handleMessageChange(e) {
+    this.setState({
+        message: e.target.value
+    })
+  }
+
+  handleMessageSubmit(e) {
+    e.preventDefault();
+    this.submitMessage()
+    this.setState({
+        message: ''
+    })
+  }
+
+  submitMessage(){
+    const message = {}
+    message.username = this.props.username
+    message.text = this.state.message
+    if(message.text !== ''){
+      this.props.socket.emit("message", this.props.boardId, message)
+      this.setState({messages:[...this.state.messages, message]})
+    }
+    
+  }
+
+  render () {
+    const { messages } = this.props
+    const {message} = this.state
+
+    return (
+      <div>
+        <div style={{ maxHeight: '175px', overflowX:'hidden', overflowY:'scroll'}}>
+          
+          {messages.map((message, key) => 
+            
+            <div key={key}>
+              {message.username === this.props.username ?
+                <span key={key} style={{display: 'block', float:'right', clear: 'both', marginTop:'.5em'}}>
+                  
+                  <span style={{backgroundColor:'#36d8b7',padding: '5px', borderRadius: '5px', color: 'white', float:'right',display:'block', clear:'both'}}>{message.text}</span>
+                </span>
+              :
+              <span key={key} style={{display: 'block',marginTop:'.5em', clear: 'both'}}>
+                  <span style={{fontSize:'10px', paddingLeft:'5px', margin:'0',display:'block', color: 'gray', lineHeight:'10px'}}>{message.username}</span>
+                  <span style={{backgroundColor:'#DDD',display:'block',padding: '5px', borderRadius: '5px', color: 'black'}}>{message.text}</span>
+                </span>
+              }
+            </div>
+          )}
+          <div ref={this.messagesEndRef}/>
+        </div>
+
+        <Form onSubmit={(e)=>this.handleMessageSubmit(e)} style={{marginTop:'10px'}}>
+          
+          <Input ref={(input) => { this.nameInput = input; }} icon='angle right' placeholder='Send message..'onChange={(e)=>this.handleMessageChange(e)} value={message} style={{display:'flex'}}/>
+        </Form>
+      </div>
+    )
+  }
+}
+
+
 export default Board;
+
+
