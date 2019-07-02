@@ -1,0 +1,21 @@
+version: '2.3'
+
+services:
+
+  node:
+    build:
+      context: .
+      target: 'dev'
+    ports:
+      - "3006:3000"
+      - "9229:9229"
+      - "9230:9230"
+    volumes:
+      - .:/app:delegated
+      - notused:/app/node_modules
+    environment:
+      - REACP_APP_API=tilesdev.bsord.io
+    healthcheck:
+      disable: true
+volumes:
+  notused:
