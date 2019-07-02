@@ -12,10 +12,7 @@ services:
       - "9230:9230"
     volumes:
       - .:/app:delegated
-      - notused:/app/node_modules
     environment:
-      - REACP_APP_API=tilesdev.bsord.io
+      - REACT_APP_API=${REACT_APP_API}
     healthcheck:
       disable: true
-volumes:
-  notused:
