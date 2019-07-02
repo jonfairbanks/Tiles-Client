@@ -1,6 +1,12 @@
 {
   "name": "tiles-client",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Api for tiles client",
+  "author": "Brandon Sorgdrager",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bsord/tiles-client.git"
+  },
   "private": false,
   "license": "MIT",
   "dependencies": {
@@ -10,13 +16,13 @@
     "chance": "^1.0.18",
     "moment": "^2.24.0",
     "pnglib-es6": "^1.0.1",
-    "react": "^16.4.1",
+    "react": "^16.8.6",
     "react-chat-widget": "^2.1.4-1",
     "react-color": "^2.14.1",
-    "react-dom": "^16.4.1",
+    "react-dom": "^16.8.6",
     "react-draggable": "^3.3.0",
-    "react-router-dom": "^4.3.1",
-    "react-scripts": "^2.1.5",
+    "react-router-dom": "^5.0.1",
+    "react-scripts": "^3.0.1",
     "react-spinners": "^0.5.1",
     "react-stack-grid": "^0.7.1",
     "react-toastify": "^4.5.2",
@@ -26,8 +32,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!pnglib-es6)/\"",
+    "eject": "react-scripts eject",
+    "lint": "node node_modules/eslint/bin/eslint.js --config node_modules/eslint-config-react-app/index.js ."
   },
   "browserslist": [
     ">0.2%",
