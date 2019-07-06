@@ -3,12 +3,11 @@
 }
   
 .rcw-header {
-  background-color: #333333 !important;
-  display: none !important;
+  background-color: #fff !important;
 }
 
 .rcw-title {
-  background-color: #333333 !important;
+  background-color: #fff !important;
   padding: none !important;
 }
 
@@ -29,6 +28,7 @@
   box-shadow: none !important;
 }
 
-.rcw-hide-sm {
-  display: none !important;
+.rcw-client {
+  background-color: #36D8B7 !important;
 }
+
