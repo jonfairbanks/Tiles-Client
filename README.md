@@ -49,35 +49,35 @@ The Tiles UI should now be available at http://localhost:3000
 The following is an Nginx configuration block for both frontend and backend:
 
 ```sh
-    server {
-        listen               443  ssl;
-        ssl                  on;
-        ssl_certificate fullchain.pem;
-        ssl_certificate_key privkey.pem;
-        server_name    tiles.mysite.io;
-        large_client_header_buffers 4 8k;
-        location / {
-            proxy_pass      http://127.0.0.1:3000/;
-            # Upgrade for Websockets
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-        }
-        location /socket.io/ {
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection "upgrade";
-                proxy_http_version 1.1;
-                proxy_set_header Host $host;
-                proxy_pass http://127.0.0.1:4001/socket.io/;
-        }
-        location /tiles {
-            proxy_pass      http://127.0.0.1:4001/tiles;
-            # Upgrade for Websockets
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-        }
+server {
+    listen               443  ssl;
+    ssl                  on;
+    ssl_certificate fullchain.pem;
+    ssl_certificate_key privkey.pem;
+    server_name    tiles.mysite.io;
+    large_client_header_buffers 4 8k;
+    location / {
+        proxy_pass      http://127.0.0.1:3000/;
+        # Upgrade for Websockets
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
     }
+    location /socket.io/ {
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_pass http://127.0.0.1:4001/socket.io/;
+    }
+    location /tiles {
+        proxy_pass      http://127.0.0.1:4001/tiles;
+        # Upgrade for Websockets
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
 ```
 
 #### Docker
