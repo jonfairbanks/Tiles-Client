@@ -2,7 +2,7 @@
   Tiles
 </h1>
 
-<img src="https://raw.githubusercontent.com/Fairbanks-io/tiles-client/master/logo.png" alt="tiles-logo"/>
+<h1 align="center"><img align="center" src="https://raw.githubusercontent.com/Fairbanks-io/tiles-client/master/logo.png" height="50%" width="50%" alt="tiles-logo"/></h1>
 
 ![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/fairbanksio/tiles-client.svg)
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/fairbanksio/tiles-client.svg)
