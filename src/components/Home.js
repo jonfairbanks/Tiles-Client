@@ -4,7 +4,7 @@ import axios from 'axios'
 import { RingLoader } from 'react-spinners';
 import { Link } from "react-router-dom";
 import { Input, Button, Divider, Form, Grid, Segment, Image } from 'semantic-ui-react';
-import PNGImage from 'pnglib-es6';
+import PNGImage from 'pnglib-es6'
 import StackGrid from "react-stack-grid";
 import { css } from '@emotion/core';
 import moment from 'moment';
