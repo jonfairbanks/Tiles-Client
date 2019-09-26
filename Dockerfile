@@ -26,13 +26,13 @@ CMD ["npm", "run", "test"]
 FROM test as audit
 USER root
 RUN npm audit --audit-level critical
-ARG MICROSCANNER_TOKEN
+ARG MICROSCANNER_TOKEN=""
 ADD https://get.aquasec.com/microscanner /
 RUN chmod +x /microscanner
 RUN /microscanner $MICROSCANNER_TOKEN --continue-on-failure
 
 FROM source as build
-ARG REACT_APP_API
+ARG REACT_APP_API=""
 ENV REACT_APP_API=$REACT_APP_API
 RUN npm run build
 
